@@ -8,8 +8,6 @@ GitHub: https://github.com/yagyeshvyas
 
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
 from analyzer import (
     extract_text_from_pdf, analyze_resume,
     get_score_color, get_score_label,
@@ -215,29 +213,16 @@ def render_chips(items: list, chip_class: str) -> str:
     return f'<div class="chip-container">{chips}</div>'
 
 
-def gauge_chart(score: int, title: str, color: str):
-    fig = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=score,
-        title={"text": title, "font": {"size": 14}},
-        gauge={
-            "axis": {"range": [0, 100], "tickfont": {"size": 10}},
-            "bar": {"color": color, "thickness": 0.3},
-            "steps": [
-                {"range": [0, 50],  "color": "#ffebee"},
-                {"range": [50, 75], "color": "#fff8e1"},
-                {"range": [75, 100],"color": "#e8f5e9"},
-            ],
-            "threshold": {
-                "line": {"color": color, "width": 4},
-                "thickness": 0.75,
-                "value": score
-            }
-        },
-        number={"suffix": "/100", "font": {"size": 28}}
-    ))
-    fig.update_layout(height=220, margin=dict(t=30, b=10, l=20, r=20))
-    return fig
+def score_display(score: int, title: str, color: str):
+    """Display score as a styled metric with progress bar."""
+    st.markdown(f"""
+    <div class="score-card" style="border-top-color:{color}">
+        <div class="score-title">{title}</div>
+        <div class="score-number" style="color:{color}">{score}</div>
+        <div class="score-label">out of 100</div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.progress(score / 100)
 
 
 # ═══════════════════════════════════════════════════════════
@@ -357,10 +342,7 @@ if page == "🎯 Analyze Resume":
         g1, g2 = st.columns(2)
         with g1:
             ats_color = get_score_color(result["ats_score"])
-            st.plotly_chart(
-                gauge_chart(result["ats_score"], "ATS Score", ats_color),
-                use_container_width=True
-            )
+            score_display(result["ats_score"], "🎯 ATS Score", ats_color)
             st.markdown(
                 f"<div style='text-align:center; font-weight:600; color:{ats_color}'>"
                 f"{get_score_label(result['ats_score'])}</div>",
@@ -368,10 +350,7 @@ if page == "🎯 Analyze Resume":
             )
         with g2:
             match_color = get_score_color(result["match_score"])
-            st.plotly_chart(
-                gauge_chart(result["match_score"], "Job Match Score", match_color),
-                use_container_width=True
-            )
+            score_display(result["match_score"], "💼 Job Match Score", match_color)
             st.markdown(
                 f"<div style='text-align:center; font-weight:600; color:{match_color}'>"
                 f"{get_score_label(result['match_score'])}</div>",
@@ -523,28 +502,17 @@ elif page == "📊 My Dashboard":
         if len(score_trend) >= 2:
             st.markdown("### 📈 Score Improvement Over Time")
             df_trend = pd.DataFrame(score_trend)
-            fig = px.line(
-                df_trend, x="date", y=["ats", "match"],
-                labels={"value": "Score", "variable": "Type", "date": "Date"},
-                color_discrete_map={"ats": "#667eea", "match": "#764ba2"},
-                markers=True
-            )
-            fig.update_layout(height=350, legend_title_text="Score Type")
-            st.plotly_chart(fig, use_container_width=True)
+            df_trend = df_trend.set_index("date")[["ats", "match"]]
+            df_trend.columns = ["ATS Score", "Match Score"]
+            st.line_chart(df_trend)
 
         # ── Top Missing Skills ──
         if missing_skills_data:
             st.markdown("### 🎯 Skills You Keep Missing (Focus on These!)")
-            df_skills = pd.DataFrame(missing_skills_data)
-            fig2 = px.bar(
-                df_skills.head(10), x="count", y="skill",
-                orientation="h",
-                color="count",
-                color_continuous_scale="Reds",
-                labels={"count": "Times Required", "skill": "Skill"}
-            )
-            fig2.update_layout(height=350, showlegend=False)
-            st.plotly_chart(fig2, use_container_width=True)
+            df_skills = pd.DataFrame(missing_skills_data).head(10)
+            df_skills = df_skills.set_index("skill")
+            df_skills.columns = ["Times Required"]
+            st.bar_chart(df_skills)
 
         # ── History Table ──
         st.markdown("### 📋 Analysis History")
