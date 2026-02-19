@@ -94,8 +94,14 @@ def extract_text_from_pdf(uploaded_file) -> str:
 def analyze_resume(api_key: str, model_id: str, resume_text: str,
                    job_description: str, job_title: str = "", company_name: str = "") -> dict:
 
-    prompt = f"""You are an expert ATS (Applicant Tracking System) and career coach AI.
-Analyze the following resume against the job description and provide a detailed evaluation.
+    prompt = f"""You are a senior technical recruiter and career coach with 15+ years of experience at top MNC companies (Google, Amazon, Microsoft, TCS, Infosys). You have deep knowledge of:
+- How ATS (Applicant Tracking Systems) like Workday, Greenhouse, Lever, and Taleo score resumes
+- What hiring managers actually look for in tech candidates in 2025
+- Real salary and hiring trends from job market data
+- Common reasons candidates get rejected at each stage
+- What separates candidates who get interviews from those who don't
+
+Analyze this resume against the job description with the precision of a real recruiter making a hiring decision today.
 
 JOB TITLE: {job_title or "Not specified"}
 COMPANY: {company_name or "Not specified"}
@@ -106,22 +112,37 @@ RESUME:
 JOB DESCRIPTION:
 {job_description}
 
-Provide your analysis ONLY as valid JSON (no markdown, no extra text) in this exact format:
+Apply these real-world recruiter insights in your analysis:
+1. ATS systems reject 75% of resumes before human review - check for exact keyword matches
+2. Recruiters spend avg 6-7 seconds on first resume scan - check if key info is immediately visible
+3. Quantified achievements (numbers, %, $) are 40% more likely to pass screening
+4. Skills listed but not demonstrated in experience are red flags
+5. Job hopping (< 1 year at multiple companies) raises concerns
+6. GitHub/portfolio links dramatically increase callbacks for tech roles
+7. GPA matters less than projects and internships for experienced candidates
+8. F1 visa / work authorization status affects hiring - US companies need OPT/CPT mention
+9. Buzzwords without context (e.g. "passionate", "hardworking") waste valuable space
+10. Cloud certifications (AWS, GCP, Azure) significantly boost tech resume scores in 2025
+
+Based on this expert knowledge, provide ONLY valid JSON (no markdown, no extra text):
 {{
-  "ats_score": <integer 0-100, how well the resume will pass ATS systems>,
-  "match_score": <integer 0-100, overall match to job requirements>,
-  "matched_skills": [<list of skills/keywords found in both resume and JD>],
-  "missing_skills": [<list of important skills/keywords in JD but missing from resume>],
-  "strengths": [<3-5 specific strengths of this resume for this role>],
-  "improvements": [<4-6 specific, actionable improvements the candidate should make>],
-  "keyword_suggestions": [<5-8 exact keywords/phrases to add to resume for better ATS>],
-  "experience_gap": "<brief analysis of experience level match>",
-  "education_match": "<brief analysis of education requirements match>",
-  "overall_summary": "<2-3 sentence honest assessment of this application chances>",
-  "quick_wins": [<2-3 things they can fix in 10 minutes to immediately improve the resume>]
+  "ats_score": <integer 0-100, strict ATS keyword + format score>,
+  "match_score": <integer 0-100, holistic match including experience depth, not just keywords>,
+  "hire_probability": <integer 0-100, realistic chance of getting an interview callback>,
+  "matched_skills": [<exact skills/keywords present in BOTH resume and JD>],
+  "missing_skills": [<critical skills in JD completely absent from resume>],
+  "strengths": [<3-5 genuine strengths with specific evidence from the resume>],
+  "improvements": [<4-6 specific improvements with exact wording suggestions where possible>],
+  "keyword_suggestions": [<6-8 exact ATS keywords to add, taken directly from the JD>],
+  "experience_gap": "<honest assessment: does experience level/years match what JD requires?>",
+  "education_match": "<does education match requirements? note if overqualified/underqualified>",
+  "red_flags": [<1-3 specific things a recruiter would immediately notice negatively, be honest>],
+  "overall_summary": "<2-3 sentences: honest realistic assessment, mention visa/OPT if F1 relevant, give actual interview chances>",
+  "quick_wins": [<3 specific things to fix TODAY that will immediately improve callback rate>],
+  "salary_insight": "<based on role/location/experience, estimated salary range this resume would command>"
 }}
 
-Be specific, honest, and actionable."""
+Be brutally honest like a real recruiter. Candidates need truth, not false hope. If the match is poor, say so clearly with specific reasons. If strong, explain exactly why."""
 
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -151,6 +172,19 @@ Be specific, honest, and actionable."""
             raise ValueError("Insufficient credits for this paid model. Use a free model or add credits at openrouter.ai")
         elif response.status_code == 429:
             raise ValueError("Rate limit hit. Please wait 30 seconds and try again.")
+        elif response.status_code == 404:
+            error_body = response.text
+            if "data policy" in error_body.lower() or "privacy" in error_body.lower() or "publication" in error_body.lower():
+                raise ValueError(
+                    "⚙️ OpenRouter Privacy Setting Required!\n\n"
+                    "Free models need a one-time account setting:\n"
+                    "1. Go to: https://openrouter.ai/settings/privacy\n"
+                    "2. Enable 'Allow free model usage' / Data Collection toggle\n"
+                    "3. Save and come back here\n\n"
+                    "This is a one-time fix — all free models will work after!"
+                )
+            else:
+                raise ValueError(f"Model not found (404). Try a different model from the dropdown.\nDetails: {response.text[:200]}")
         elif response.status_code != 200:
             raise ValueError(f"API error {response.status_code}: {response.text[:200]}")
 
@@ -168,10 +202,11 @@ Be specific, honest, and actionable."""
         result = json.loads(raw)
 
         defaults = {
-            "ats_score": 0, "match_score": 0, "matched_skills": [],
-            "missing_skills": [], "strengths": [], "improvements": [],
-            "keyword_suggestions": [], "experience_gap": "",
-            "education_match": "", "overall_summary": "", "quick_wins": []
+            "ats_score": 0, "match_score": 0, "hire_probability": 0,
+            "matched_skills": [], "missing_skills": [], "strengths": [],
+            "improvements": [], "keyword_suggestions": [], "experience_gap": "",
+            "education_match": "", "overall_summary": "", "quick_wins": [],
+            "red_flags": [], "salary_insight": ""
         }
         for key, default in defaults.items():
             result.setdefault(key, default)

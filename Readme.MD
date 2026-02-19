@@ -130,7 +130,7 @@ MIT License — free to use, modify, and share.
 ## 👨‍💻 Author
 
 **Yagyesh Vyas** — Data & IT Developer | CS Graduate Student  
-[LinkedIn](https://www.linkedin.com/in/yagyeshvyas) · [Portfolio](https://yagyesh-vyasg11k379.gamma.site/)
+[LinkedIn](https://www.linkedin.com/in/yagyeshvyas) · [Portfolio](https://yagyesh-vyas-g11k379.gamma.site/)
 
 ---
 

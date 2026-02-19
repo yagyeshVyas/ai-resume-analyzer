@@ -33,62 +33,124 @@ st.set_page_config(
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
-    /* Main theme */
+    /* ── Auto dark/light mode variables ── */
+    :root {
+        --card-bg: #ffffff;
+        --card-text: #1a1a2e;
+        --card-shadow: rgba(0,0,0,0.08);
+        --label-color: #555555;
+        --header-color: #222222;
+        --box-bg: #f8f9ff;
+        --box-border: #667eea;
+        --win-bg: #fffde7;
+        --win-border: #f9a825;
+        --chip-green-bg: #e8f5e9; --chip-green-text: #1b5e20; --chip-green-border: #a5d6a7;
+        --chip-red-bg: #ffebee;   --chip-red-text: #b71c1c;   --chip-red-border: #ef9a9a;
+        --chip-blue-bg: #e3f2fd;  --chip-blue-text: #0d47a1;  --chip-blue-border: #90caf9;
+        --api-info-bg: #e8f4fd; --api-info-color: #1565c0;
+        --footer-color: #888888;
+        --none-color: #888888;
+    }
+
+    /* Dark mode overrides */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --card-bg: #1e1e2e;
+            --card-text: #e0e0e0;
+            --card-shadow: rgba(0,0,0,0.4);
+            --label-color: #aaaaaa;
+            --header-color: #e0e0e0;
+            --box-bg: #1a1a2e;
+            --box-border: #7c91f5;
+            --win-bg: #2a2500;
+            --win-border: #f9a825;
+            --chip-green-bg: #1b3a1f; --chip-green-text: #81c784; --chip-green-border: #2e7d32;
+            --chip-red-bg: #3a1a1a;   --chip-red-text: #ef9a9a;   --chip-red-border: #c62828;
+            --chip-blue-bg: #0d2137;  --chip-blue-text: #90caf9;  --chip-blue-border: #1565c0;
+            --api-info-bg: #0d2137; --api-info-color: #90caf9;
+            --footer-color: #666666;
+            --none-color: #666666;
+        }
+    }
+
+    /* Streamlit dark mode class override */
+    [data-theme="dark"] {
+        --card-bg: #1e1e2e;
+        --card-text: #e0e0e0;
+        --card-shadow: rgba(0,0,0,0.4);
+        --label-color: #aaaaaa;
+        --header-color: #e0e0e0;
+        --box-bg: #1a1a2e;
+        --box-border: #7c91f5;
+        --win-bg: #2a2500;
+        --win-border: #f9a825;
+        --chip-green-bg: #1b3a1f; --chip-green-text: #81c784; --chip-green-border: #2e7d32;
+        --chip-red-bg: #3a1a1a;   --chip-red-text: #ef9a9a;   --chip-red-border: #c62828;
+        --chip-blue-bg: #0d2137;  --chip-blue-text: #90caf9;  --chip-blue-border: #1565c0;
+        --api-info-bg: #0d2137; --api-info-color: #90caf9;
+        --footer-color: #666666;
+        --none-color: #666666;
+    }
+
+    /* Main header - always has gradient so always readable */
     .main-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 2rem;
         border-radius: 12px;
         text-align: center;
         margin-bottom: 2rem;
-        color: white;
+        color: white !important;
     }
-    .main-header h1 { font-size: 2.5rem; margin: 0; font-weight: 800; }
-    .main-header p  { font-size: 1.1rem; margin: 0.5rem 0 0; opacity: 0.9; }
+    .main-header h1 { font-size: 2.5rem; margin: 0; font-weight: 800; color: white !important; }
+    .main-header p  { font-size: 1.1rem; margin: 0.5rem 0 0; opacity: 0.9; color: white !important; }
 
     /* Score cards */
     .score-card {
-        background: white;
+        background: var(--card-bg);
+        color: var(--card-text);
         border-radius: 12px;
         padding: 1.5rem;
         text-align: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 15px var(--card-shadow);
         border-top: 4px solid;
         margin-bottom: 1rem;
     }
     .score-number { font-size: 3rem; font-weight: 900; line-height: 1; }
-    .score-label  { font-size: 0.85rem; color: #666; margin-top: 0.3rem; }
-    .score-title  { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .score-label  { font-size: 0.85rem; color: var(--label-color); margin-top: 0.3rem; }
+    .score-title  { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--card-text); }
 
     /* Skill chips */
     .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin: 0.5rem 0; }
     .chip-green {
-        background: #e8f5e9; color: #2e7d32; padding: 4px 12px;
-        border-radius: 20px; font-size: 0.82rem; font-weight: 500;
-        border: 1px solid #a5d6a7;
+        background: var(--chip-green-bg); color: var(--chip-green-text);
+        padding: 4px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 500;
+        border: 1px solid var(--chip-green-border);
     }
     .chip-red {
-        background: #ffebee; color: #c62828; padding: 4px 12px;
-        border-radius: 20px; font-size: 0.82rem; font-weight: 500;
-        border: 1px solid #ef9a9a;
+        background: var(--chip-red-bg); color: var(--chip-red-text);
+        padding: 4px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 500;
+        border: 1px solid var(--chip-red-border);
     }
     .chip-blue {
-        background: #e3f2fd; color: #1565c0; padding: 4px 12px;
-        border-radius: 20px; font-size: 0.82rem; font-weight: 500;
-        border: 1px solid #90caf9;
+        background: var(--chip-blue-bg); color: var(--chip-blue-text);
+        padding: 4px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 500;
+        border: 1px solid var(--chip-blue-border);
     }
 
     /* Info boxes */
     .info-box {
-        background: #f8f9ff;
-        border-left: 4px solid #667eea;
+        background: var(--box-bg);
+        color: var(--card-text);
+        border-left: 4px solid var(--box-border);
         padding: 1rem 1.2rem;
         border-radius: 0 8px 8px 0;
         margin: 0.5rem 0;
         font-size: 0.92rem;
     }
     .win-box {
-        background: #fffde7;
-        border-left: 4px solid #f9a825;
+        background: var(--win-bg);
+        color: var(--card-text);
+        border-left: 4px solid var(--win-border);
         padding: 1rem 1.2rem;
         border-radius: 0 8px 8px 0;
         margin: 0.5rem 0;
@@ -98,20 +160,28 @@ st.markdown("""
     /* Section headers */
     .section-header {
         font-size: 1.15rem; font-weight: 700;
-        color: #333; margin: 1.2rem 0 0.6rem;
+        color: var(--header-color);
+        margin: 1.2rem 0 0.6rem;
         display: flex; align-items: center; gap: 8px;
     }
 
-    /* Sidebar */
+    /* Sidebar info box */
     .api-info {
-        background: #e8f4fd;
+        background: var(--api-info-bg);
         border-radius: 8px;
         padding: 0.8rem;
         font-size: 0.82rem;
-        color: #1565c0;
+        color: var(--api-info-color);
         margin-top: 0.5rem;
     }
-    
+    .api-info a { color: var(--api-info-color); }
+
+    /* Footer */
+    .footer-text { color: var(--footer-color) !important; }
+
+    /* None found text */
+    .none-text { color: var(--none-color); font-style: italic; }
+
     /* Hide streamlit default elements */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
@@ -196,7 +266,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("""
-    <div style="font-size:0.8rem; color:#999; text-align:center;">
+    <div class="footer-text" style="font-size:0.8rem; text-align:center;">
     Built with ❤️ by Yagyesh Vyas<br>
     Python · OpenRouter AI · SQLite · Streamlit
     </div>
@@ -208,7 +278,7 @@ with st.sidebar:
 # ─────────────────────────────────────────────
 def render_chips(items: list, chip_class: str) -> str:
     if not items:
-        return "<i style='color:#999'>None found</i>"
+        return "<span class='none-text'>None found</span>"
     chips = "".join(f'<span class="{chip_class}">{item}</span>' for item in items)
     return f'<div class="chip-container">{chips}</div>'
 
@@ -292,7 +362,7 @@ if page == "🎯 Analyze Resume":
     )
 
     if not api_key:
-        st.warning("⚠️ Please enter your Gemini API key in the sidebar to get started. It's free!")
+        st.warning("⚠️ Please enter your OpenRouter API key in the sidebar to get started. It's free! Get one at: openrouter.ai/keys")
 
     if analyze_btn:
         if not resume_text.strip():
@@ -339,7 +409,7 @@ if page == "🎯 Analyze Resume":
                        (f" @ **{result['company_name']}**" if result.get('company_name') else ""))
 
         # ── Score Gauges ──
-        g1, g2 = st.columns(2)
+        g1, g2, g3 = st.columns(3)
         with g1:
             ats_color = get_score_color(result["ats_score"])
             score_display(result["ats_score"], "🎯 ATS Score", ats_color)
@@ -354,6 +424,14 @@ if page == "🎯 Analyze Resume":
             st.markdown(
                 f"<div style='text-align:center; font-weight:600; color:{match_color}'>"
                 f"{get_score_label(result['match_score'])}</div>",
+                unsafe_allow_html=True
+            )
+        with g3:
+            hire_color = get_score_color(result.get("hire_probability", 0))
+            score_display(result.get("hire_probability", 0), "📞 Interview Chance", hire_color)
+            st.markdown(
+                f"<div style='text-align:center; font-weight:600; color:{hire_color}'>"
+                f"{get_score_label(result.get('hire_probability', 0))}</div>",
                 unsafe_allow_html=True
             )
 
@@ -400,6 +478,19 @@ if page == "🎯 Analyze Resume":
             st.markdown('<div class="section-header">⚡ Quick Wins (Fix in 10 Minutes!)</div>', unsafe_allow_html=True)
             for win in result["quick_wins"]:
                 st.markdown(f'<div class="win-box">⚡ {win}</div>', unsafe_allow_html=True)
+
+        # ── Red Flags ──
+        if result.get("red_flags"):
+            st.markdown("---")
+            st.markdown('<div class="section-header">🚨 Recruiter Red Flags (Be Aware!)</div>', unsafe_allow_html=True)
+            for flag in result["red_flags"]:
+                st.markdown(f'<div class="win-box" style="border-color:#ff4444;">🚨 {flag}</div>', unsafe_allow_html=True)
+
+        # ── Salary Insight ──
+        if result.get("salary_insight"):
+            st.markdown("---")
+            st.markdown('<div class="section-header">💰 Salary Insight</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="info-box">💰 {result["salary_insight"]}</div>', unsafe_allow_html=True)
 
         # ── Additional Details ──
         with st.expander("📋 Experience & Education Analysis"):
