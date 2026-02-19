@@ -1,5 +1,5 @@
-streamlit
-requests
-pdfplumber
-plotly
-pandas
+streamlit==1.32.0
+requests==2.31.0
+pdfplumber==0.11.0
+plotly==5.18.0
+pandas==2.2.0
