@@ -6,6 +6,7 @@ Author: Yagyesh Vyas | github.com/yagyeshVyas
 import streamlit as st
 import pandas as pd
 import requests
+from providers import PROVIDERS, call_api
 from analyzer import (
     extract_text_from_pdf, analyze_resume,
     get_score_color, get_score_label,
@@ -153,32 +154,63 @@ init_db()
 # ── SIDEBAR ──────────────────────────────────────────────
 with st.sidebar:
     st.markdown("<div style='font-family:Syne,sans-serif;font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent'>🚀 AI Career Suite</div>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size:0.72rem;color:#475569;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.5rem'>Powered by OpenRouter</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.72rem;color:#475569;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.5rem'>10+ AI Providers</div>", unsafe_allow_html=True)
 
-    st.markdown("**🔑 API Key**")
-    api_key = st.text_input("", type="password", placeholder="sk-or-v1-...", label_visibility="collapsed")
-    st.markdown("""<div class="api-box">🆓 Free — no credit card needed<br>Get key: <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a></div>""", unsafe_allow_html=True)
+    # ── Provider Selector ──
+    st.markdown("**🌐 AI Provider**")
+    selected_provider = st.selectbox("", list(PROVIDERS.keys()), label_visibility="collapsed", key="provider_sel")
+    pinfo = PROVIDERS[selected_provider]
+
+    # Provider info box
+    free_tier_color = "#10b981" if "✅" in pinfo["free_tier"] else "#f59e0b"
+    st.markdown(f"""<div class="api-box" style="font-size:0.76rem; line-height:1.8">
+    <b>{pinfo['description']}</b><br>
+    <span style="color:{free_tier_color}">{pinfo['free_tier']}</span>
+    </div>""", unsafe_allow_html=True)
+
     st.markdown("---")
 
-    tier = st.radio("**🤖 Model Tier**", ["🆓 Free", "💎 Paid"], horizontal=True)
-    if tier == "🆓 Free":
-        st.markdown('<span class="free-badge">✓ No credits needed</span>', unsafe_allow_html=True)
-        opts = list(FREE_MODELS.keys())
+    # ── API Key ──
+    st.markdown(f"**🔑 {selected_provider} API Key**")
+    api_key = st.text_input("", type="password", placeholder=pinfo["placeholder"], label_visibility="collapsed")
+    st.markdown(f"""<div class="api-box">Get key: <a href="{pinfo['get_key_url']}" target="_blank">{pinfo['get_key_url'].replace('https://','')}</a></div>""", unsafe_allow_html=True)
+    st.markdown("---")
+
+    # ── Model Selector ──
+    free_models, paid_models = pinfo["free_models"], pinfo["paid_models"]
+    has_free = len(free_models) > 0
+    has_paid = len(paid_models) > 0
+
+    if has_free and has_paid:
+        tier = st.radio("**🤖 Model Tier**", ["🆓 Free", "💎 Paid"], horizontal=True)
+        if tier == "🆓 Free":
+            st.markdown('<span class="free-badge">✓ No credits needed</span>', unsafe_allow_html=True)
+            model_opts = list(free_models.keys())
+        else:
+            st.markdown('<span class="paid-badge">💳 Credits required</span>', unsafe_allow_html=True)
+            model_opts = list(paid_models.keys())
+    elif has_free:
+        st.markdown('<span class="free-badge">✓ All models FREE</span>', unsafe_allow_html=True)
+        model_opts = list(free_models.keys())
+    elif has_paid:
+        st.markdown('<span class="paid-badge">💳 Paid models only</span>', unsafe_allow_html=True)
+        model_opts = list(paid_models.keys())
     else:
-        st.markdown('<span class="paid-badge">💳 Credits required</span>', unsafe_allow_html=True)
-        opts = list(PAID_MODELS.keys())
+        model_opts = ["No models available"]
 
-    sel_name = st.selectbox("", opts, label_visibility="collapsed")
-    sel_id   = get_model_id(sel_name)
+    sel_name = st.selectbox("", model_opts, label_visibility="collapsed")
+    # Resolve model ID from the selected provider's models
+    all_provider_models = {**free_models, **paid_models}
+    sel_id = all_provider_models.get(sel_name, sel_name)
+
     st.markdown("---")
-
     page = st.radio("**📌 Navigate**", [
         "🎯 Analyzer", "✉️ Cover Letter",
         "🎤 Interview Prep", "📝 Resume Builder",
         "📊 Dashboard", "ℹ️ About"
     ], label_visibility="collapsed")
     st.markdown("---")
-    st.markdown("<div style='font-size:0.72rem;color:#475569;text-align:center;line-height:1.8'>Built by <b style='color:#7c3aed'>Yagyesh Vyas</b><br>Python · OpenRouter · SQLite · Streamlit</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.72rem;color:#475569;text-align:center;line-height:1.8'>Built by <b style='color:#7c3aed'>Yagyesh Vyas</b><br>Python · 10+ AI APIs · SQLite · Streamlit</div>", unsafe_allow_html=True)
 
 
 # ── HELPERS ──────────────────────────────────────────────
@@ -197,16 +229,7 @@ def score_card(score, title):
     st.progress(score / 100)
 
 def ai_call(prompt, temperature=0.7, max_tokens=2500):
-    r = requests.post("https://openrouter.ai/api/v1/chat/completions",
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json",
-                 "HTTP-Referer": "https://ai-career-suite.streamlit.app", "X-Title": "AI Career Suite"},
-        json={"model": sel_id, "messages": [{"role": "user", "content": prompt}],
-              "max_tokens": max_tokens, "temperature": temperature}, timeout=90)
-    if r.status_code == 401: raise ValueError("Invalid API key — get a free one at openrouter.ai/keys")
-    if r.status_code == 402: raise ValueError("No credits — use a free model or add credits at openrouter.ai")
-    if r.status_code == 429: raise ValueError("Rate limit hit! (Free: 20/min, 200/day)\n→ Switch to '🎲 Auto Free Router' in sidebar — picks any available model automatically!")
-    if r.status_code != 200: raise ValueError(f"API error {r.status_code}: {r.text[:150]}")
-    return r.json()["choices"][0]["message"]["content"].strip()
+    return call_api(selected_provider, api_key, sel_id, prompt, temperature, max_tokens)
 
 
 # ════════════════════════════════════════════════════════
@@ -249,7 +272,7 @@ if page == "🎯 Analyzer":
         else:
             with st.spinner("🤖 Analyzing with senior recruiter-level AI..."):
                 try:
-                    result = analyze_resume(api_key, sel_id, resume_text, jd, jt, co)
+                    result = analyze_resume(api_key, sel_id, resume_text, jd, jt, co, selected_provider)
                     result.update({"resume_filename": resume_file, "job_title": jt, "company_name": co, "word_count": len(resume_text.split())})
                     save_analysis(result)
                     st.session_state["last_result"] = result

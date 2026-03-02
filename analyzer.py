@@ -1,92 +1,20 @@
 """
-analyzer.py - AI-powered resume analysis using OpenRouter API
-Supports 100+ models including free and paid options.
+analyzer.py - AI Resume Analysis
+Supports all providers: OpenRouter, OpenAI, Anthropic, Google Gemini,
+Groq, DeepSeek, Mistral, Together AI, Perplexity, xAI, Cohere, HuggingFace
 """
 
 import re
 import json
-import requests
 import pdfplumber
 from io import BytesIO
+from providers import call_api, PROVIDERS, get_all_models_for_provider
 
 
-# ─────────────────────────────────────────────
-# AVAILABLE MODELS ON OPENROUTER
-# ─────────────────────────────────────────────
-
-FREE_MODELS = {
-    # ── ⭐ BEST FIRST — Always Start Here ──
-    "🎲 Auto Free Router ★ RECOMMENDED — Never gets 404":           "openrouter/free",
-    "🦙 Llama 3.3 70B ★ Most Reliable Free Model":                  "meta-llama/llama-3.3-70b-instruct:free",
-    "🟠 OpenAI GPT-OSS 120B ★ OpenAI's Free Model":                 "openai/gpt-oss-120b:free",
-
-    # ── 🔵 Qwen ──
-    "🔵 Qwen3 Coder 480B — Best for Tech/Coding (262K)":            "qwen/qwen3-coder:free",
-    "🔵 Qwen3 Next 80B — Latest Qwen (262K)":                       "qwen/qwen3-next-80b-a3b-instruct:free",
-    "🔵 Qwen3 235B Thinking — Best Reasoning (131K)":               "qwen/qwen3-235b-a22b-thinking-2507",
-    "🔵 Qwen3 4B — Fast & Lightweight (41K)":                       "qwen/qwen3-4b:free",
-
-    # ── 🟡 NVIDIA ──
-    "🟡 NVIDIA Nemotron 30B — MoE Powerful (256K)":                 "nvidia/nemotron-3-nano-30b-a3b:free",
-    "🟡 NVIDIA Nemotron 12B Vision — Multimodal (128K)":            "nvidia/nemotron-nano-12b-v2-vl:free",
-    "🟡 NVIDIA Nemotron 9B — Compact & Fast (128K)":                "nvidia/nemotron-nano-9b-v2:free",
-
-    # ── 🌟 Google ──
-    "🌟 Gemma 3 27B — Best Google Free (131K)":                     "google/gemma-3-27b-it:free",
-    "🌸 Gemma 3 12B — Google Balanced (33K)":                       "google/gemma-3-12b-it:free",
-    "🌸 Gemma 3 4B — Google Lightweight (33K)":                     "google/gemma-3-4b-it:free",
-    "🌸 Gemma 3n E4B — Google Nano (8K)":                           "google/gemma-3n-e4b-it:free",
-    "🌸 Gemma 3n E2B — Google Ultra Nano (8K)":                     "google/gemma-3n-e2b-it:free",
-
-    # ── ⚡ Mistral ──
-    "⚡ Mistral Small 3.1 24B — Fast & Multimodal (128K)":          "mistralai/mistral-small-3.1-24b-instruct:free",
-
-    # ── 🟠 OpenAI Open Source ──
-    "🟠 OpenAI GPT-OSS 20B — Lightweight (131K)":                   "openai/gpt-oss-20b:free",
-
-    # ── 🦙 Meta Llama ──
-    "🦙 Llama 3.2 3B — Ultra Fast (131K)":                          "meta-llama/llama-3.2-3b-instruct:free",
-    "🦙 Nous Hermes 3 Llama 405B — Huge (131K)":                    "nousresearch/hermes-3-llama-3.1-405b:free",
-
-    # ── 🟣 Other Verified Models ──
-    "🟣 StepFun Step 3.5 Flash — MoE Reasoning (256K)":             "stepfun/step-3.5-flash:free",
-    "🟣 Z.AI GLM 4.5 Air — Agent-Focused (131K)":                   "z-ai/glm-4.5-air:free",
-    "🟣 Arcee Trinity Large — 400B MoE (131K)":                     "arcee-ai/trinity-large-preview:free",
-    "🟣 Arcee Trinity Mini — Efficient (131K)":                     "arcee-ai/trinity-mini:free",
-    "🟣 Solar Pro 3 — Upstage 102B MoE (128K)":                     "upstage/solar-pro-3:free",
-    "🟣 LiquidAI LFM 2.5 Thinking (33K)":                          "liquid/lfm-2.5-1.2b-thinking:free",
-    "🟣 LiquidAI LFM 2.5 Instruct (33K)":                          "liquid/lfm-2.5-1.2b-instruct:free",
-    "🟣 Dolphin Mistral 24B (33K)":                                 "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-}
-
-PAID_MODELS = {
-    # ── 👑 Anthropic Claude (confirmed working) ──
-    "👑 Claude 3.5 Sonnet — Best Overall (~$3/$15)":               "anthropic/claude-3.5-sonnet",
-    "🧬 Claude 3.5 Haiku — Fastest Claude (~$1/$5)":              "anthropic/claude-3.5-haiku",
-    "🔵 Claude 3 Opus — Most Powerful (~$15/$75)":                 "anthropic/claude-3-opus",
-
-    # ── 💎 OpenAI (confirmed working) ──
-    "💎 GPT-4o — Top Tier (~$2.5/$10)":                           "openai/gpt-4o",
-    "🚀 GPT-4o Mini — Fast & Cheap (~$0.15/$0.6)":                "openai/gpt-4o-mini",
-    "🔮 GPT-4 Turbo — Reliable (~$10/$30)":                       "openai/gpt-4-turbo",
-
-    # ── 🌙 Google Gemini (confirmed working) ──
-    "🌙 Gemini 2.0 Flash — Fast Google (~$0.1/$0.4)":             "google/gemini-2.0-flash-001",
-    "🌙 Gemini Pro 1.5 — Long Context (~$1.25/$5)":               "google/gemini-pro-1.5",
-
-    # ── 🧠 DeepSeek (confirmed working) ──
-    "🧠 DeepSeek R1 — Best Reasoning (~$0.55/$2.19)":             "deepseek/deepseek-r1",
-    "💬 DeepSeek Chat V3 — Low Cost (~$0.27/$1.1)":               "deepseek/deepseek-chat",
-
-    # ── ⚡ Mistral Paid (confirmed working) ──
-    "⚡ Mistral Large — Powerful (~$2/$6)":                         "mistralai/mistral-large",
-    "⚡ Mistral Small — Budget (~$0.1/$0.3)":                      "mistralai/mistral-small",
-
-    # ── 🔵 Qwen Paid ──
-    "🔵 Qwen3 235B — Best Open Source Paid":                      "qwen/qwen3-235b-a22b",
-}
-
-ALL_MODELS = {**FREE_MODELS, **PAID_MODELS}
+# ── Keep these for backward compat with app.py imports ──
+FREE_MODELS  = PROVIDERS["🔀 OpenRouter"]["free_models"]
+PAID_MODELS  = PROVIDERS["🔀 OpenRouter"]["paid_models"]
+ALL_MODELS   = {**FREE_MODELS, **PAID_MODELS}
 
 
 def get_model_id(display_name: str) -> str:
@@ -103,24 +31,22 @@ def extract_text_from_pdf(uploaded_file) -> str:
                     text += page_text + "\n"
     except Exception as e:
         raise ValueError(f"Could not read PDF: {str(e)}")
-
     if not text.strip():
         raise ValueError("No text found in PDF. Make sure it's not a scanned image.")
-
     return text.strip()
 
 
 def analyze_resume(api_key: str, model_id: str, resume_text: str,
-                   job_description: str, job_title: str = "", company_name: str = "") -> dict:
+                   job_description: str, job_title: str = "",
+                   company_name: str = "", provider_name: str = "🔀 OpenRouter") -> dict:
 
-    prompt = f"""You are a senior technical recruiter and career coach with 15+ years of experience at top MNC companies (Google, Amazon, Microsoft, TCS, Infosys). You have deep knowledge of:
-- How ATS (Applicant Tracking Systems) like Workday, Greenhouse, Lever, and Taleo score resumes
-- What hiring managers actually look for in tech candidates in 2025
-- Real salary and hiring trends from job market data
-- Common reasons candidates get rejected at each stage
-- What separates candidates who get interviews from those who don't
+    prompt = f"""You are a senior technical recruiter and career coach with 15+ years at top MNC companies (Google, Amazon, Microsoft, TCS, Infosys). You deeply understand:
+- How ATS systems (Workday, Greenhouse, Lever, Taleo) score resumes
+- What hiring managers look for in 2025 tech candidates
+- Real salary and hiring trends
+- Why candidates get rejected at each stage
 
-Analyze this resume against the job description with the precision of a real recruiter making a hiring decision today.
+Analyze this resume against the job description with the precision of a real recruiter.
 
 JOB TITLE: {job_title or "Not specified"}
 COMPANY: {company_name or "Not specified"}
@@ -131,94 +57,45 @@ RESUME:
 JOB DESCRIPTION:
 {job_description}
 
-Apply these real-world recruiter insights in your analysis:
-1. ATS systems reject 75% of resumes before human review - check for exact keyword matches
-2. Recruiters spend avg 6-7 seconds on first resume scan - check if key info is immediately visible
-3. Quantified achievements (numbers, %, $) are 40% more likely to pass screening
+Key recruiter insights to apply:
+1. ATS rejects 75% of resumes — check exact keyword matches
+2. Recruiters spend 6-7 seconds on first scan — check immediate visibility
+3. Quantified achievements (numbers, %, $) are 40% more likely to pass
 4. Skills listed but not demonstrated in experience are red flags
-5. Job hopping (< 1 year at multiple companies) raises concerns
-6. GitHub/portfolio links dramatically increase callbacks for tech roles
-7. GPA matters less than projects and internships for experienced candidates
-8. F1 visa / work authorization status affects hiring - US companies need OPT/CPT mention
-9. Buzzwords without context (e.g. "passionate", "hardworking") waste valuable space
-10. Cloud certifications (AWS, GCP, Azure) significantly boost tech resume scores in 2025
+5. GitHub/portfolio links dramatically increase callbacks for tech roles
+6. F1 visa/OPT/CPT mention matters for US companies
+7. Cloud certifications (AWS, GCP, Azure) boost tech resume scores significantly
+8. Buzzwords without context waste valuable resume space
 
-Based on this expert knowledge, provide ONLY valid JSON (no markdown, no extra text):
+Provide ONLY valid JSON (no markdown, no extra text):
 {{
-  "ats_score": <integer 0-100, strict ATS keyword + format score>,
-  "match_score": <integer 0-100, holistic match including experience depth, not just keywords>,
-  "hire_probability": <integer 0-100, realistic chance of getting an interview callback>,
-  "matched_skills": [<exact skills/keywords present in BOTH resume and JD>],
-  "missing_skills": [<critical skills in JD completely absent from resume>],
-  "strengths": [<3-5 genuine strengths with specific evidence from the resume>],
-  "improvements": [<4-6 specific improvements with exact wording suggestions where possible>],
-  "keyword_suggestions": [<6-8 exact ATS keywords to add, taken directly from the JD>],
-  "experience_gap": "<honest assessment: does experience level/years match what JD requires?>",
-  "education_match": "<does education match requirements? note if overqualified/underqualified>",
-  "red_flags": [<1-3 specific things a recruiter would immediately notice negatively, be honest>],
-  "overall_summary": "<2-3 sentences: honest realistic assessment, mention visa/OPT if F1 relevant, give actual interview chances>",
-  "quick_wins": [<3 specific things to fix TODAY that will immediately improve callback rate>],
-  "salary_insight": "<based on role/location/experience, estimated salary range this resume would command>"
+  "ats_score": <integer 0-100>,
+  "match_score": <integer 0-100>,
+  "hire_probability": <integer 0-100, realistic interview callback chance>,
+  "matched_skills": [<skills in BOTH resume and JD>],
+  "missing_skills": [<critical JD skills absent from resume>],
+  "strengths": [<3-5 genuine strengths with specific resume evidence>],
+  "improvements": [<4-6 specific improvements with exact wording suggestions>],
+  "keyword_suggestions": [<6-8 exact ATS keywords from the JD to add>],
+  "experience_gap": "<honest assessment of experience level match>",
+  "education_match": "<education requirements match assessment>",
+  "red_flags": [<1-3 things a recruiter notices negatively — be honest>],
+  "overall_summary": "<2-3 sentences honest assessment, mention visa/OPT if F1 relevant>",
+  "quick_wins": [<3 things to fix TODAY to immediately improve callback rate>],
+  "salary_insight": "<estimated salary range this resume would command>"
 }}
 
-Be brutally honest like a real recruiter. Candidates need truth, not false hope. If the match is poor, say so clearly with specific reasons. If strong, explain exactly why."""
-
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://ai-resume-analyzer.streamlit.app",
-        "X-Title": "AI Resume Analyzer"
-    }
-
-    payload = {
-        "model": model_id,
-        "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 2000,
-        "temperature": 0.3
-    }
+Be brutally honest — candidates need truth, not false hope."""
 
     try:
-        response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers=headers,
-            json=payload,
-            timeout=60
-        )
+        raw = call_api(provider_name, api_key, model_id, prompt, temperature=0.3, max_tokens=2000)
 
-        if response.status_code == 401:
-            raise ValueError("Invalid OpenRouter API key. Get a free key at: https://openrouter.ai/keys")
-        elif response.status_code == 402:
-            raise ValueError("Insufficient credits for this paid model. Use a free model or add credits at openrouter.ai")
-        elif response.status_code == 429:
-            raise ValueError(
-                "Rate limit hit! Free tier = 20 requests/minute & 200/day. "
-                "Fix: (1) Wait 1 minute and retry, "
-                "(2) Switch to a different free model in sidebar, "
-                "(3) Use '🎲 Auto Free Router' — picks whichever model has capacity now!"
-            )
-        elif response.status_code == 404:
-            error_body = response.text
-            if "data policy" in error_body.lower() or "privacy" in error_body.lower() or "publication" in error_body.lower():
-                raise ValueError(
-                    "⚙️ OpenRouter Privacy Setting Required!\n\n"
-                    "Free models need a one-time account setting:\n"
-                    "1. Go to: https://openrouter.ai/settings/privacy\n"
-                    "2. Enable 'Allow free model usage' / Data Collection toggle\n"
-                    "3. Save and come back here\n\n"
-                    "This is a one-time fix — all free models will work after!"
-                )
-            else:
-                raise ValueError(f"Model not found (404). Try a different model from the dropdown.\nDetails: {response.text[:200]}")
-        elif response.status_code != 200:
-            raise ValueError(f"API error {response.status_code}: {response.text[:200]}")
-
-        data = response.json()
-        raw = data["choices"][0]["message"]["content"].strip()
-
+        # Strip markdown code fences
         raw = re.sub(r"^```json\s*", "", raw)
         raw = re.sub(r"^```\s*",     "", raw)
         raw = re.sub(r"\s*```$",     "", raw)
 
+        # Extract JSON object
         json_match = re.search(r'\{.*\}', raw, re.DOTALL)
         if json_match:
             raw = json_match.group()
@@ -235,15 +112,13 @@ Be brutally honest like a real recruiter. Candidates need truth, not false hope.
         for key, default in defaults.items():
             result.setdefault(key, default)
 
-        result["ats_score"]   = max(0, min(100, int(result["ats_score"])))
-        result["match_score"] = max(0, min(100, int(result["match_score"])))
-
+        result["ats_score"]        = max(0, min(100, int(result["ats_score"])))
+        result["match_score"]      = max(0, min(100, int(result["match_score"])))
+        result["hire_probability"] = max(0, min(100, int(result["hire_probability"])))
         return result
 
     except json.JSONDecodeError:
-        raise ValueError("AI returned an invalid response. Try again or switch to a different model.")
-    except requests.Timeout:
-        raise ValueError("Request timed out. Try a faster model like Gemini 2.0 Flash.")
+        raise ValueError("AI returned invalid response. Try again or switch model.")
     except ValueError:
         raise
     except Exception as e:
