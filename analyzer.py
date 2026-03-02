@@ -15,56 +15,29 @@ from io import BytesIO
 # ─────────────────────────────────────────────
 
 FREE_MODELS = {
-    # ── 🏆 Best for Resume Analysis ──
-    "🏆 Llama 3.3 70B — Best for Resume (Recommended)":    "meta-llama/llama-3.3-70b-instruct:free",
-    "🧠 DeepSeek R1 0528 — Best Reasoning":                "deepseek/deepseek-r1-0528:free",
-    "⚡ Mistral Small 3.1 24B — Fast & Smart":             "mistralai/mistral-small-3.1-24b-instruct:free",
-    "🌟 Gemma 3 27B — Google Model":                       "google/gemma-3-27b-it:free",
-
-    # ── 🤖 Qwen Models ──
-    "🔵 Qwen3 Coder — Best for Coding":                    "qwen/qwen3-coder:free",
-    "🔵 Qwen3 4B — Lightweight & Fast":                    "qwen/qwen3-4b:free",
-
-    # ── 🟢 Meta Llama Models ──
-    "🟢 Llama 3.2 3B — Fastest Free Model":               "meta-llama/llama-3.2-3b-instruct:free",
-    "🟢 Nous Hermes 3 Llama 405B — Huge Model":           "nousresearch/hermes-3-llama-3.1-405b:free",
-
-    # ── 🔴 Google Models ──
-    "🔴 Gemma 3 12B — Google Balanced":                    "google/gemma-3-12b-it:free",
-    "🔴 Gemma 3 4B — Google Lightweight":                  "google/gemma-3-4b-it:free",
-    "🔴 Gemma 3n E4B — Google Nano":                       "google/gemma-3n-e4b-it:free",
-    "🔴 Gemma 3n E2B — Google Ultra Nano":                 "google/gemma-3n-e2b-it:free",
-
-    # ── 🟡 NVIDIA Models ──
-    "🟡 NVIDIA Nemotron 30B — Powerful":                   "nvidia/nemotron-3-nano-30b-a3b:free",
-    "🟡 NVIDIA Nemotron 12B Vision — Multimodal":          "nvidia/nemotron-nano-12b-v2-vl:free",
-    "🟡 NVIDIA Nemotron 9B — Balanced":                    "nvidia/nemotron-nano-9b-v2:free",
-
-    # ── 🟠 OpenAI Open Source ──
-    "🟠 OpenAI GPT-OSS 120B — OpenAI Free":               "openai/gpt-oss-120b:free",
-    "🟠 OpenAI GPT-OSS 20B — OpenAI Lightweight":         "openai/gpt-oss-20b:free",
-
-    # ── 🟣 Other Models ──
-    "🟣 StepFun Step 3.5 Flash — 256K Context":           "stepfun/step-3.5-flash:free",
-    "🟣 Arcee Trinity Large — Reasoning":                  "arcee-ai/trinity-large-preview:free",
-    "🟣 Arcee Trinity Mini — Lightweight":                  "arcee-ai/trinity-mini:free",
-    "🟣 Solar Pro 3 — Upstage Model":                      "upstage/solar-pro-3:free",
-    "🟣 Z.AI GLM 4.5 Air — 131K Context":                 "z-ai/glm-4.5-air:free",
-    "🟣 Dolphin Mistral 24B — Uncensored":                 "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-    "🟣 LiquidAI LFM 2.5 Thinking — Reasoning":           "liquid/lfm-2.5-1.2b-thinking:free",
-    "🟣 LiquidAI LFM 2.5 Instruct — Fast":                "liquid/lfm-2.5-1.2b-instruct:free",
-
-    # ── 🎲 Auto Router ──
-    "🎲 Auto Free Router — Let OpenRouter Pick":           "openrouter/free",
+    # ── ⭐ Top Recommended ──
+    "🎲 Auto Free Router — Let OpenRouter Pick Best":    "openrouter/free",
+    "🦙 Llama 4 Maverick — Latest Meta (Best Free)":    "meta-llama/llama-4-maverick:free",
+    "🦙 Llama 4 Scout — Meta Fast & Smart":             "meta-llama/llama-4-scout:free",
+    "🧠 DeepSeek R1 — Best Reasoning":                  "deepseek/deepseek-r1:free",
+    "💬 DeepSeek V3 — Great Quality":                   "deepseek/deepseek-chat-v3-0324:free",
+    "🌟 Gemini 2.5 Pro Exp — Google Latest":            "google/gemini-2.5-pro-exp-03-25:free",
+    "⚡ Mistral Small 3.1 24B — Fast":                  "mistralai/mistral-small-3.1-24b-instruct:free",
+    "🦙 Llama 3.3 70B — Reliable & Proven":             "meta-llama/llama-3.3-70b-instruct:free",
+    "🌟 Qwen 2.5 72B — Good Quality":                   "qwen/qwen-2.5-72b-instruct:free",
+    "🟠 OpenAI GPT-OSS 120B — OpenAI Free Model":       "openai/gpt-oss-120b:free",
+    "🔵 Qwen3 Coder — Best for Technical Roles":        "qwen/qwen3-coder:free",
+    "🟡 NVIDIA Nemotron 30B — Powerful":                "nvidia/nemotron-3-nano-30b-a3b:free",
+    "🌸 Gemma 3 27B — Google Balanced":                 "google/gemma-3-27b-it:free",
 }
 
 PAID_MODELS = {
-    "👑 Claude 3.5 Sonnet — Best Overall":   "anthropic/claude-3.5-sonnet",
-    "💎 GPT-4o — Top Tier":                  "openai/gpt-4o",
-    "🚀 GPT-4o Mini — Fast & Cheap":         "openai/gpt-4o-mini",
-    "🌙 Gemini 2.0 Flash — Latest Google":   "google/gemini-2.0-flash-001",
-    "🧬 Claude 3 Haiku — Fastest Paid":      "anthropic/claude-3-haiku",
-    "🔮 Llama 3.3 70B — Best Open Source":   "meta-llama/llama-3.3-70b-instruct",
+    "👑 Claude 3.5 Sonnet — Best Overall":       "anthropic/claude-3.5-sonnet",
+    "💎 GPT-4o — Top Tier OpenAI":               "openai/gpt-4o",
+    "🚀 GPT-4o Mini — Fast & Affordable":        "openai/gpt-4o-mini",
+    "🌙 Gemini 2.0 Flash — Google Stable":       "google/gemini-2.0-flash-001",
+    "🧬 Claude 3.5 Haiku — Fastest Claude":      "anthropic/claude-3.5-haiku",
+    "🔮 DeepSeek R1 — Best Paid Reasoning":      "deepseek/deepseek-r1",
 }
 
 ALL_MODELS = {**FREE_MODELS, **PAID_MODELS}
@@ -171,7 +144,12 @@ Be brutally honest like a real recruiter. Candidates need truth, not false hope.
         elif response.status_code == 402:
             raise ValueError("Insufficient credits for this paid model. Use a free model or add credits at openrouter.ai")
         elif response.status_code == 429:
-            raise ValueError("Rate limit hit. Please wait 30 seconds and try again.")
+            raise ValueError(
+                "Rate limit hit! Free tier = 20 requests/minute & 200/day. "
+                "Fix: (1) Wait 1 minute and retry, "
+                "(2) Switch to a different free model in sidebar, "
+                "(3) Use '🎲 Auto Free Router' — picks whichever model has capacity now!"
+            )
         elif response.status_code == 404:
             error_body = response.text
             if "data policy" in error_body.lower() or "privacy" in error_body.lower() or "publication" in error_body.lower():
