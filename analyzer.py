@@ -15,29 +15,85 @@ from io import BytesIO
 # ─────────────────────────────────────────────
 
 FREE_MODELS = {
-    # ── ⭐ Top Recommended ──
-    "🎲 Auto Free Router — Let OpenRouter Pick Best":    "openrouter/free",
-    "🦙 Llama 4 Maverick — Latest Meta (Best Free)":    "meta-llama/llama-4-maverick:free",
-    "🦙 Llama 4 Scout — Meta Fast & Smart":             "meta-llama/llama-4-scout:free",
-    "🧠 DeepSeek R1 — Best Reasoning":                  "deepseek/deepseek-r1:free",
-    "💬 DeepSeek V3 — Great Quality":                   "deepseek/deepseek-chat-v3-0324:free",
-    "🌟 Gemini 2.5 Pro Exp — Google Latest":            "google/gemini-2.5-pro-exp-03-25:free",
-    "⚡ Mistral Small 3.1 24B — Fast":                  "mistralai/mistral-small-3.1-24b-instruct:free",
-    "🦙 Llama 3.3 70B — Reliable & Proven":             "meta-llama/llama-3.3-70b-instruct:free",
-    "🌟 Qwen 2.5 72B — Good Quality":                   "qwen/qwen-2.5-72b-instruct:free",
-    "🟠 OpenAI GPT-OSS 120B — OpenAI Free Model":       "openai/gpt-oss-120b:free",
-    "🔵 Qwen3 Coder — Best for Technical Roles":        "qwen/qwen3-coder:free",
-    "🟡 NVIDIA Nemotron 30B — Powerful":                "nvidia/nemotron-3-nano-30b-a3b:free",
-    "🌸 Gemma 3 27B — Google Balanced":                 "google/gemma-3-27b-it:free",
+    # ── ⭐ Auto Router ──
+    "🎲 Auto Free Router — Let OpenRouter Pick Best (Recommended)": "openrouter/free",
+
+    # ── 🦙 Meta Llama ──
+    "🦙 Llama 3.3 70B — Reliable & Fast (128K)":                   "meta-llama/llama-3.3-70b-instruct:free",
+    "🦙 Llama 3.2 3B — Ultra Fast (131K)":                         "meta-llama/llama-3.2-3b-instruct:free",
+    "🦙 Nous Hermes 3 Llama 405B — Huge Model (131K)":             "nousresearch/hermes-3-llama-3.1-405b:free",
+
+    # ── 🧠 DeepSeek ──
+    "🧠 DeepSeek R1 — Best Reasoning (Free)":                      "deepseek/deepseek-r1:free",
+
+    # ── 🌟 Google ──
+    "🌟 Gemma 3 27B — Best Google Free (131K)":                    "google/gemma-3-27b-it:free",
+    "🌸 Gemma 3 12B — Google Balanced (33K)":                      "google/gemma-3-12b-it:free",
+    "🌸 Gemma 3 4B — Google Lightweight (33K)":                    "google/gemma-3-4b-it:free",
+    "🌸 Gemma 3n E4B — Google Nano (8K)":                          "google/gemma-3n-e4b-it:free",
+    "🌸 Gemma 3n E2B — Google Ultra Nano (8K)":                    "google/gemma-3n-e2b-it:free",
+
+    # ── 🔵 Qwen ──
+    "🔵 Qwen3 Coder 480B — Best for Coding (262K)":               "qwen/qwen3-coder:free",
+    "🔵 Qwen3 Next 80B — Latest Qwen (262K)":                     "qwen/qwen3-next-80b-a3b-instruct:free",
+    "🔵 Qwen3 4B — Fast & Lightweight (41K)":                     "qwen/qwen3-4b:free",
+
+    # ── 🟠 OpenAI Open Source ──
+    "🟠 OpenAI GPT-OSS 120B — OpenAI Free Flagship (131K)":       "openai/gpt-oss-120b:free",
+    "🟠 OpenAI GPT-OSS 20B — OpenAI Free Light (131K)":           "openai/gpt-oss-20b:free",
+
+    # ── ⚡ Mistral ──
+    "⚡ Mistral Small 3.1 24B — Fast & Multimodal (128K)":         "mistralai/mistral-small-3.1-24b-instruct:free",
+
+    # ── 🟡 NVIDIA ──
+    "🟡 NVIDIA Nemotron 30B — Powerful (256K)":                    "nvidia/nemotron-3-nano-30b-a3b:free",
+    "🟡 NVIDIA Nemotron 12B Vision — Multimodal (128K)":           "nvidia/nemotron-nano-12b-v2-vl:free",
+    "🟡 NVIDIA Nemotron 9B — Balanced (128K)":                     "nvidia/nemotron-nano-9b-v2:free",
+
+    # ── 🟣 Other ──
+    "🟣 StepFun Step 3.5 Flash — Huge Context (256K)":            "stepfun/step-3.5-flash:free",
+    "🟣 Solar Pro 3 — Upstage Model (128K)":                       "upstage/solar-pro-3:free",
+    "🟣 Z.AI GLM 4.5 Air — Long Context (131K)":                   "z-ai/glm-4.5-air:free",
+    "🟣 Arcee Trinity Large — Reasoning (131K)":                   "arcee-ai/trinity-large-preview:free",
+    "🟣 Arcee Trinity Mini — Lightweight (131K)":                  "arcee-ai/trinity-mini:free",
+    "🟣 LiquidAI LFM 2.5 Thinking — Reasoning (33K)":             "liquid/lfm-2.5-1.2b-thinking:free",
+    "🟣 LiquidAI LFM 2.5 Instruct — Fast (33K)":                  "liquid/lfm-2.5-1.2b-instruct:free",
+    "🟣 Dolphin Mistral 24B — Uncensored (33K)":                   "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
 }
 
 PAID_MODELS = {
-    "👑 Claude 3.5 Sonnet — Best Overall":       "anthropic/claude-3.5-sonnet",
-    "💎 GPT-4o — Top Tier OpenAI":               "openai/gpt-4o",
-    "🚀 GPT-4o Mini — Fast & Affordable":        "openai/gpt-4o-mini",
-    "🌙 Gemini 2.0 Flash — Google Stable":       "google/gemini-2.0-flash-001",
-    "🧬 Claude 3.5 Haiku — Fastest Claude":      "anthropic/claude-3.5-haiku",
-    "🔮 DeepSeek R1 — Best Paid Reasoning":      "deepseek/deepseek-r1",
+    # ── 👑 Anthropic Claude ──
+    "👑 Claude Sonnet 4.6 — Best Mid-Range ($3/$15)":              "anthropic/claude-sonnet-4-6",
+    "💜 Claude Opus 4.6 — Most Powerful ($5/$25)":                 "anthropic/claude-opus-4-6",
+    "🧬 Claude Haiku 4.5 — Fastest Claude ($1/$5)":               "anthropic/claude-haiku-4-5",
+    "🔵 Claude 3.5 Sonnet — Proven Reliable ($3/$15)":            "anthropic/claude-3.5-sonnet",
+
+    # ── 💎 OpenAI ──
+    "💎 GPT-5.2 — OpenAI Flagship ($1.75/$14)":                   "openai/gpt-5.2",
+    "🚀 GPT-4o — Top Tier Stable ($2.5/$10)":                     "openai/gpt-4o",
+    "⚡ GPT-4o Mini — Fast & Cheap ($0.15/$0.6)":                  "openai/gpt-4o-mini",
+    "🔮 GPT-5 Mini — Budget GPT-5 ($0.25/$2)":                    "openai/gpt-5-mini",
+
+    # ── 🌙 Google Gemini ──
+    "🌙 Gemini 3.1 Pro — Latest Google ($2/$12)":                  "google/gemini-3.1-pro",
+    "🌙 Gemini 2.5 Pro — Google Premium ($1.25/$10)":              "google/gemini-2.5-pro",
+    "⚡ Gemini 2.5 Flash — Fast Google ($0.15/$0.6)":              "google/gemini-2.5-flash",
+    "💫 Gemini 2.0 Flash — Stable Google ($0.1/$0.4)":            "google/gemini-2.0-flash-001",
+
+    # ── 🧠 DeepSeek ──
+    "🧠 DeepSeek R1 — Best Reasoning Paid ($0.55/$2.19)":         "deepseek/deepseek-r1",
+    "💬 DeepSeek V3.2 — Frontier at Low Cost ($0.25/$0.38)":      "deepseek/deepseek-v3.2",
+
+    # ── ⚡ xAI Grok ──
+    "⚡ Grok 4 Fast — Ultra Cheap ($0.2/$1)":                      "x-ai/grok-4-fast",
+    "🔥 Grok 4 — xAI Flagship ($3/$15)":                          "x-ai/grok-4",
+
+    # ── 🔵 Qwen Paid ──
+    "🔵 Qwen3 235B — Best Open Source Paid":                      "qwen/qwen3-235b-a22b",
+
+    # ── ⚡ Mistral Paid ──
+    "⚡ Mistral Large — Powerful ($2/$6)":                          "mistralai/mistral-large",
+    "⚡ Mistral Small — Cheap ($0.1/$0.3)":                        "mistralai/mistral-small",
 }
 
 ALL_MODELS = {**FREE_MODELS, **PAID_MODELS}
