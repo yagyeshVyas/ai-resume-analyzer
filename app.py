@@ -260,7 +260,7 @@ with st.sidebar:
     st.markdown("### 📌 Navigation")
     page = st.radio(
         "Go to",
-        ["🎯 Analyze Resume", "📊 My Dashboard", "ℹ️ How It Works"],
+        ["🎯 Analyze Resume", "✉️ Cover Letter", "🎤 Interview Prep", "📝 Resume Builder", "📊 Dashboard", "ℹ️ How It Works"],
         label_visibility="collapsed"
     )
 
@@ -557,10 +557,389 @@ EDUCATION MATCH
         )
 
 
+
 # ═══════════════════════════════════════════════════════════
-# PAGE 2: DASHBOARD
+# SHARED AI HELPER
 # ═══════════════════════════════════════════════════════════
-elif page == "📊 My Dashboard":
+def ai_call(api_key: str, model_id: str, prompt: str, spinner_text: str = "🤖 AI is thinking...") -> str:
+    """Generic OpenRouter call that returns plain text."""
+    import requests
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://ai-resume-analyzer.streamlit.app",
+        "X-Title": "AI Resume Analyzer"
+    }
+    payload = {
+        "model": model_id,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 2000,
+        "temperature": 0.7
+    }
+    response = requests.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        headers=headers, json=payload, timeout=60
+    )
+    if response.status_code == 401:
+        raise ValueError("Invalid API key. Get one free at openrouter.ai/keys")
+    elif response.status_code == 402:
+        raise ValueError("Insufficient credits. Use a free model or add credits at openrouter.ai")
+    elif response.status_code != 200:
+        raise ValueError(f"API error {response.status_code}")
+    return response.json()["choices"][0]["message"]["content"].strip()
+
+
+# ═══════════════════════════════════════════════════════════
+# PAGE: COVER LETTER GENERATOR
+# ═══════════════════════════════════════════════════════════
+if page == "✉️ Cover Letter":
+
+    st.markdown("""
+    <div class="main-header">
+        <h1>✉️ AI Cover Letter Generator</h1>
+        <p>Paste your resume + job description → Get a custom, ATS-friendly cover letter in seconds</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if not api_key:
+        st.warning("⚠️ Please enter your OpenRouter API key in the sidebar. It's free at openrouter.ai/keys")
+    
+    cl1, cl2 = st.columns(2)
+
+    with cl1:
+        st.markdown("### 📄 Your Resume")
+        cl_resume_type = st.radio("Input", ["Upload PDF", "Paste Text"], horizontal=True, label_visibility="collapsed")
+        cl_resume_text = ""
+        if cl_resume_type == "Upload PDF":
+            cl_uploaded = st.file_uploader("Upload resume PDF", type=["pdf"], key="cl_pdf")
+            if cl_uploaded:
+                try:
+                    cl_resume_text = extract_text_from_pdf(cl_uploaded)
+                    st.success(f"✅ Parsed {len(cl_resume_text.split())} words")
+                except ValueError as e:
+                    st.error(str(e))
+        else:
+            cl_resume_text = st.text_area("Paste resume", height=200, key="cl_resume_paste",
+                                           placeholder="Paste your resume text here...")
+
+    with cl2:
+        st.markdown("### 💼 Job Details")
+        cl_job_title    = st.text_input("Job Title", placeholder="e.g. Data Engineer", key="cl_jt")
+        cl_company      = st.text_input("Company Name", placeholder="e.g. Google, Amazon", key="cl_co")
+        cl_hiring_mgr   = st.text_input("Hiring Manager Name (optional)", placeholder="e.g. John Smith", key="cl_hm")
+        cl_job_desc     = st.text_area("Job Description", height=150, key="cl_jd",
+                                        placeholder="Paste the full job posting here...")
+
+    st.markdown("### 🎨 Tone")
+    cl_tone = st.select_slider(
+        "Select tone",
+        options=["Very Formal", "Professional", "Friendly & Professional", "Enthusiastic"],
+        value="Professional",
+        label_visibility="collapsed"
+    )
+
+    cl_btn = st.button("✉️ Generate Cover Letter", type="primary", use_container_width=True, disabled=not api_key)
+
+    if cl_btn:
+        if not cl_resume_text.strip():
+            st.error("❌ Please provide your resume.")
+        elif not cl_job_desc.strip():
+            st.error("❌ Please paste the job description.")
+        else:
+            prompt = f"""You are an expert career coach and professional writer specializing in cover letters that get interviews at top companies.
+
+Write a compelling, ATS-optimized cover letter based on this information:
+
+CANDIDATE RESUME:
+{cl_resume_text}
+
+JOB TITLE: {cl_job_title or "the position"}
+COMPANY: {cl_company or "the company"}
+HIRING MANAGER: {cl_hiring_mgr or "Hiring Manager"}
+JOB DESCRIPTION:
+{cl_job_desc}
+
+TONE: {cl_tone}
+
+Requirements:
+- 3-4 paragraphs, max 400 words
+- Opening: hook that immediately shows value, NOT "I am writing to apply for..."
+- Body: connect 2-3 specific achievements from resume to job requirements with numbers/metrics
+- Show knowledge of the company and role specifically
+- Closing: confident call to action
+- Naturally include 4-5 key ATS keywords from the job description
+- Sound human, passionate, and specific — NOT generic
+
+Write ONLY the cover letter text, starting from "Dear {cl_hiring_mgr or 'Hiring Manager'},"
+"""
+            with st.spinner("✉️ Writing your personalized cover letter..."):
+                try:
+                    cover_letter = ai_call(api_key, selected_model_id, prompt)
+                    st.markdown("---")
+                    st.markdown("### ✅ Your Cover Letter")
+                    st.markdown(f'<div class="info-box" style="white-space:pre-wrap; line-height:1.8">{cover_letter}</div>', unsafe_allow_html=True)
+                    
+                    # Download button
+                    st.download_button(
+                        "⬇️ Download Cover Letter (.txt)",
+                        data=cover_letter,
+                        file_name=f"cover_letter_{(cl_company or 'company').replace(' ','_')}.txt",
+                        mime="text/plain",
+                        use_container_width=True
+                    )
+
+                    st.info("💡 **Tip:** Copy this into Google Docs to format it with your name and address at the top before sending.")
+                except Exception as e:
+                    st.error(f"❌ {str(e)}")
+
+
+# ═══════════════════════════════════════════════════════════
+# PAGE: INTERVIEW PREP
+# ═══════════════════════════════════════════════════════════
+elif page == "🎤 Interview Prep":
+
+    st.markdown("""
+    <div class="main-header">
+        <h1>🎤 AI Interview Prep</h1>
+        <p>Get role-specific interview questions + ideal answers based on YOUR resume</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if not api_key:
+        st.warning("⚠️ Please enter your OpenRouter API key in the sidebar. It's free at openrouter.ai/keys")
+
+    ip1, ip2 = st.columns(2)
+    with ip1:
+        st.markdown("### 📄 Your Resume")
+        ip_resume_type = st.radio("Input", ["Upload PDF", "Paste Text"], horizontal=True, label_visibility="collapsed", key="ip_rt")
+        ip_resume_text = ""
+        if ip_resume_type == "Upload PDF":
+            ip_uploaded = st.file_uploader("Upload resume PDF", type=["pdf"], key="ip_pdf")
+            if ip_uploaded:
+                try:
+                    ip_resume_text = extract_text_from_pdf(ip_uploaded)
+                    st.success(f"✅ Parsed {len(ip_resume_text.split())} words")
+                except ValueError as e:
+                    st.error(str(e))
+        else:
+            ip_resume_text = st.text_area("Paste resume", height=200, key="ip_paste",
+                                           placeholder="Paste your resume text here...")
+
+    with ip2:
+        st.markdown("### 💼 Job Details")
+        ip_job_title = st.text_input("Job Title", placeholder="e.g. Data Engineer, AI Engineer", key="ip_jt")
+        ip_company   = st.text_input("Company", placeholder="e.g. Google, TCS", key="ip_co")
+        ip_job_desc  = st.text_area("Job Description", height=150, key="ip_jd",
+                                     placeholder="Paste the job posting here...")
+
+    st.markdown("### ⚙️ Question Types")
+    qcol1, qcol2, qcol3, qcol4 = st.columns(4)
+    with qcol1: q_technical  = st.checkbox("🔧 Technical",   value=True)
+    with qcol2: q_behavioral = st.checkbox("🧠 Behavioral",  value=True)
+    with qcol3: q_situational= st.checkbox("💡 Situational", value=True)
+    with qcol4: q_company    = st.checkbox("🏢 Company Fit", value=True)
+
+    num_questions = st.slider("Number of questions per category", 2, 5, 3)
+
+    ip_btn = st.button("🎤 Generate Interview Questions", type="primary", use_container_width=True, disabled=not api_key)
+
+    if ip_btn:
+        if not ip_resume_text.strip():
+            st.error("❌ Please provide your resume.")
+        elif not ip_job_desc.strip():
+            st.error("❌ Please paste the job description.")
+        else:
+            selected_types = []
+            if q_technical:   selected_types.append("Technical (role-specific coding/tools/concepts)")
+            if q_behavioral:  selected_types.append("Behavioral (STAR format: past experience)")
+            if q_situational: selected_types.append("Situational (hypothetical scenarios)")
+            if q_company:     selected_types.append("Company Fit (culture, motivation, goals)")
+
+            prompt = f"""You are a senior technical interviewer at a top MNC company with 15 years of experience hiring for {ip_job_title or "tech"} roles.
+
+Based on this candidate's resume and the job description, generate highly targeted interview questions WITH ideal answers.
+
+CANDIDATE RESUME:
+{ip_resume_text}
+
+JOB TITLE: {ip_job_title or "Not specified"}
+COMPANY: {ip_company or "Not specified"}
+JOB DESCRIPTION:
+{ip_job_desc}
+
+Generate {num_questions} questions for each of these categories: {', '.join(selected_types)}
+
+For EACH question provide:
+1. The question (make it specific to their resume and the role — not generic)
+2. Why interviewers ask this (1 sentence)
+3. Ideal answer framework (3-5 bullet points with specific talking points from THEIR resume)
+4. A red flag answer to avoid
+
+Format clearly with category headers and numbered questions.
+Be specific — reference actual projects, skills, and experiences from their resume.
+"""
+            with st.spinner("🎤 Generating your personalized interview questions..."):
+                try:
+                    questions = ai_call(api_key, selected_model_id, prompt)
+                    st.markdown("---")
+                    st.markdown("### ✅ Your Interview Prep Guide")
+                    
+                    # Display in expandable sections
+                    sections = questions.split("\n\n")
+                    full_text = ""
+                    current_section = []
+                    
+                    for line in questions.split("\n"):
+                        full_text += line + "\n"
+
+                    st.markdown(f'<div class="info-box" style="white-space:pre-wrap; line-height:1.8">{questions}</div>', unsafe_allow_html=True)
+                    
+                    st.download_button(
+                        "⬇️ Download Interview Guide (.txt)",
+                        data=questions,
+                        file_name=f"interview_prep_{(ip_job_title or 'role').replace(' ','_')}.txt",
+                        mime="text/plain",
+                        use_container_width=True
+                    )
+
+                    st.info("💡 **Tip:** Practice answering each question out loud 3 times before the interview. Record yourself and watch it back!")
+                except Exception as e:
+                    st.error(f"❌ {str(e)}")
+
+
+# ═══════════════════════════════════════════════════════════
+# PAGE: AI RESUME BUILDER
+# ═══════════════════════════════════════════════════════════
+elif page == "📝 Resume Builder":
+
+    st.markdown("""
+    <div class="main-header">
+        <h1>📝 AI Resume Builder</h1>
+        <p>Answer a few questions → Get a complete ATS-optimized resume ready to use</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if not api_key:
+        st.warning("⚠️ Please enter your OpenRouter API key in the sidebar. It's free at openrouter.ai/keys")
+
+    st.markdown("### 👤 Personal Information")
+    rb1, rb2 = st.columns(2)
+    with rb1:
+        rb_name     = st.text_input("Full Name *", placeholder="Yagyesh Vyas")
+        rb_email    = st.text_input("Email *", placeholder="you@email.com")
+        rb_phone    = st.text_input("Phone", placeholder="+1 (123) 456-7890")
+        rb_location = st.text_input("Location", placeholder="Richmond, VA, USA")
+    with rb2:
+        rb_linkedin  = st.text_input("LinkedIn URL", placeholder="linkedin.com/in/yourname")
+        rb_github    = st.text_input("GitHub URL", placeholder="github.com/yourname")
+        rb_portfolio = st.text_input("Portfolio URL", placeholder="yoursite.com")
+        rb_target    = st.text_input("Target Job Title *", placeholder="e.g. Data Engineer, AI Engineer")
+
+    st.markdown("---")
+    st.markdown("### 🎓 Education")
+    rb_edu = st.text_area("Education (one per line)", height=100,
+        placeholder="Master's in CS, University of the Potomac, 2024-2026, GPA 3.88\nBachelor's in CS, GTU, 2019-2022, GPA 8.08")
+
+    st.markdown("---")
+    st.markdown("### 💼 Work Experience")
+    rb_exp = st.text_area("Work Experience (describe each role)", height=150,
+        placeholder="Data & IT Developer Intern, MKL Management LLC, Feb 2025 - Oct 2025\n- Built Python scripts for automation\n- Designed dashboards in Power BI\n- Managed SQL databases")
+
+    st.markdown("---")
+    st.markdown("### 🛠️ Skills & Projects")
+    rbs1, rbs2 = st.columns(2)
+    with rbs1:
+        rb_skills = st.text_area("Technical Skills (comma separated)", height=100,
+            placeholder="Python, SQL, Power BI, n8n, Docker, AWS, Streamlit, REST APIs...")
+    with rbs2:
+        rb_projects = st.text_area("Projects", height=100,
+            placeholder="AI Resume Analyzer - Built with Python + OpenRouter API + Streamlit\nDeployed on Streamlit Cloud, 100+ users")
+
+    st.markdown("---")
+    st.markdown("### 🏆 Certifications & Extra")
+    rbc1, rbc2 = st.columns(2)
+    with rbc1:
+        rb_certs = st.text_area("Certifications", height=80,
+            placeholder="AWS ML Fundamentals, Jan 2026\nKubernetes Cloud Native, Jan 2026")
+    with rbc2:
+        rb_extra = st.text_area("Target Job Description (optional but recommended)", height=80,
+            placeholder="Paste the job description you're targeting for a tailored resume...")
+
+    rb_btn = st.button("📝 Build My Resume", type="primary", use_container_width=True, disabled=not api_key)
+
+    if rb_btn:
+        if not rb_name.strip() or not rb_email.strip() or not rb_target.strip():
+            st.error("❌ Please fill in Name, Email and Target Job Title at minimum.")
+        else:
+            prompt = f"""You are an expert resume writer who has helped thousands of candidates land jobs at Google, Amazon, Microsoft, and top MNC companies. You specialize in writing ATS-optimized resumes that also impress human recruiters.
+
+Build a complete, professional resume for this candidate:
+
+NAME: {rb_name}
+EMAIL: {rb_email}
+PHONE: {rb_phone}
+LOCATION: {rb_location}
+LINKEDIN: {rb_linkedin}
+GITHUB: {rb_github}
+PORTFOLIO: {rb_portfolio}
+TARGET ROLE: {rb_target}
+
+EDUCATION:
+{rb_edu}
+
+WORK EXPERIENCE:
+{rb_exp}
+
+SKILLS:
+{rb_skills}
+
+PROJECTS:
+{rb_projects}
+
+CERTIFICATIONS:
+{rb_certs}
+
+TARGET JOB DESCRIPTION (tailor resume to this if provided):
+{rb_extra or "Not provided - write a strong general resume for the target role"}
+
+Write a complete, ready-to-use resume following these rules:
+1. Professional Summary: 3 powerful sentences highlighting value proposition for target role
+2. Experience: Use strong action verbs + quantify everything possible (add realistic estimates if needed)
+3. Skills: Organize by category (Languages, Frameworks, Tools, Cloud, etc.)
+4. Projects: Focus on impact and tech stack
+5. Include ALL ATS keywords relevant to the target role naturally throughout
+6. Format clearly with section headers using === markers
+7. Keep to 1 page worth of content (600-750 words)
+8. Make bullet points start with power verbs: Engineered, Designed, Built, Automated, Optimized, etc.
+
+Write the complete resume now, ready to copy-paste:
+"""
+            with st.spinner("📝 Building your ATS-optimized resume..."):
+                try:
+                    resume_output = ai_call(api_key, selected_model_id, prompt)
+                    st.markdown("---")
+                    st.markdown("### ✅ Your AI-Built Resume")
+
+                    st.markdown(f'<div class="info-box" style="white-space:pre-wrap; line-height:1.8; font-family: monospace">{resume_output}</div>', unsafe_allow_html=True)
+
+                    st.download_button(
+                        "⬇️ Download Resume (.txt)",
+                        data=resume_output,
+                        file_name=f"resume_{rb_name.replace(' ','_')}.txt",
+                        mime="text/plain",
+                        use_container_width=True
+                    )
+
+                    st.success("✅ Done! Copy this into Google Docs or Word, format it cleanly, then analyze it using the **Analyze Resume** tab to check your ATS score!")
+                    st.info("💡 **Pro Tip:** After downloading, go to the **🎯 Analyze Resume** tab and paste this resume against your target job description to see your ATS score!")
+                except Exception as e:
+                    st.error(f"❌ {str(e)}")
+
+
+# ═══════════════════════════════════════════════════════════
+# PAGE: DASHBOARD
+# ═══════════════════════════════════════════════════════════
+elif page == "📊 Dashboard":
 
     st.markdown("""
     <div class="main-header">
@@ -630,74 +1009,68 @@ elif page == "📊 My Dashboard":
 
 
 # ═══════════════════════════════════════════════════════════
-# PAGE 3: HOW IT WORKS
+# PAGE: HOW IT WORKS
 # ═══════════════════════════════════════════════════════════
-else:
+elif page == "ℹ️ How It Works":
     st.markdown("""
     <div class="main-header">
         <h1>ℹ️ How It Works</h1>
-        <p>Everything you need to know about the AI Resume Analyzer</p>
+        <p>Everything you need to know about the AI Career Suite</p>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown("""
     ### 🔍 What is an ATS Score?
-    An **Applicant Tracking System (ATS)** is software used by 99% of Fortune 500 companies 
-    to filter resumes before a human ever sees them. If your resume doesn't match the right 
+    An **Applicant Tracking System (ATS)** is software used by 99% of Fortune 500 companies
+    to filter resumes before a human ever sees them. If your resume doesn't match the right
     keywords, it gets rejected automatically — even if you're qualified.
 
-    Our AI simulates how an ATS reads your resume and gives you a score from 0-100.
+    ---
+
+    ### 🛠️ Tools Available
+
+    | Tool | What it does |
+    |------|-------------|
+    | 🎯 **Resume Analyzer** | ATS score, match score, interview probability, skill gaps |
+    | ✉️ **Cover Letter** | AI writes a custom, ATS-friendly cover letter |
+    | 🎤 **Interview Prep** | Role-specific questions + ideal answers based on your resume |
+    | 📝 **Resume Builder** | Answer questions → get a complete ATS-optimized resume |
+    | 📊 **Dashboard** | Track your scores and progress over time |
 
     ---
 
-    ### 🤖 How the AI Analysis Works
+    ### 🤖 AI Models Available
 
-    1. **You upload your resume** (PDF or text)
-    2. **You paste the job description** from any job site
-    3. **Google Gemini AI** reads both and compares them deeply:
-       - Finds matching and missing keywords
-       - Analyzes experience and education alignment  
-       - Suggests specific improvements
-       - Generates actionable quick wins
-    4. **Results are saved** to your personal SQLite database
-    5. **Dashboard tracks progress** over multiple applications
+    **Free (no credits needed):** Gemini 2.0 Flash · DeepSeek R1 · Llama 3.3 70B · Qwen 2.5 · Mistral 7B
 
-    ---
+    **Paid (~$0.001/request):** Claude 3.5 Sonnet · GPT-4o · GPT-4o Mini · Gemini 2.0 · Claude Haiku
 
-    ### 💡 Tips for Best Results
-
-    - Paste the **complete** job description, not just the title
-    - Use your **most recent, updated** resume
-    - Analyze **each job separately** — tailor your resume for each role
-    - Focus on the **Quick Wins** first, then tackle bigger improvements
-    - Track your scores over time in the **Dashboard**
+    Get your free key at: [openrouter.ai/keys](https://openrouter.ai/keys)
 
     ---
 
     ### 🛠️ Tech Stack
     | Component | Technology |
     |-----------|-----------|
-    | AI Engine | OpenRouter API (100+ models) |
-    | Free Models | Gemini 2.0, DeepSeek R1, Llama 3.3, Qwen 2.5 |
-    | Paid Models | Claude 3.5, GPT-4o, and more |
+    | AI Engine | OpenRouter API (10+ models) |
     | Backend | Python 3.11 |
     | Database | SQLite (local, private) |
     | Web UI | Streamlit |
-    | Charts | Plotly |
     | PDF Parser | pdfplumber |
+    | Hosting | Streamlit Cloud (free) |
 
     ---
 
     ### 🔒 Privacy
-    - Your resume data is stored **only on your local machine**
-    - Nothing is sent to any server except the Gemini AI API for analysis
-    - Your API key is never stored — it stays in your browser session only
-    
+    - Your resume is **never stored on any external server**
+    - Analysis data is saved **only on your local machine**
+    - Your API key is **only held in your browser session** — never saved
+
     ---
-    
+
     ### 🆓 100% Free Forever
-    - **Streamlit Cloud**: Free hosting at streamlit.io/cloud
-    - **Google Gemini API**: Free tier = 15 requests/minute, 1M tokens/day
+    - **Streamlit Cloud**: Free hosting
+    - **OpenRouter free models**: No credits needed
     - **SQLite**: Built into Python, no setup needed
-    - **No credit card required**
+    - **No credit card required** for free models
     """)
