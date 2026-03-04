@@ -275,6 +275,73 @@ PROVIDERS = {
         },
         "paid_models": {},
     },
+
+    # ═══════════════════════════════════════════
+    # 🖥️ OLLAMA  (Local LLM — runs on YOUR machine)
+    # ═══════════════════════════════════════════
+    "🖥️ Ollama (Local)": {
+        "description": "Run ANY model locally on your own machine — 100% private, 100% free, no internet needed",
+        "get_key_url": "https://ollama.com/download",
+        "free_tier": "✅ Completely FREE — runs on your CPU/GPU, no API key needed",
+        "endpoint": "http://localhost:11434/api/chat",
+        "type": "ollama",
+        "placeholder": "no key needed — leave blank",
+        "local_only": True,
+        "free_models": {
+            "🦙 llama3.2 — Meta Llama 3.2 3B (2GB)":               "llama3.2",
+            "🦙 llama3.1 — Meta Llama 3.1 8B (5GB)":               "llama3.1",
+            "🦙 llama3.3 — Meta Llama 3.3 70B (43GB, needs 64GB RAM)": "llama3.3",
+            "🧠 deepseek-r1:7b — DeepSeek R1 7B (4GB)":            "deepseek-r1:7b",
+            "🧠 deepseek-r1:14b — DeepSeek R1 14B (9GB)":          "deepseek-r1:14b",
+            "🔵 qwen2.5:7b — Qwen 2.5 7B (5GB)":                   "qwen2.5:7b",
+            "🔵 qwen2.5:14b — Qwen 2.5 14B (9GB)":                 "qwen2.5:14b",
+            "🌸 gemma3:4b — Google Gemma 3 4B (3GB)":              "gemma3:4b",
+            "🌸 gemma3:12b — Google Gemma 3 12B (8GB)":            "gemma3:12b",
+            "⚡ mistral — Mistral 7B (4GB)":                        "mistral",
+            "⚡ mistral-nemo — Mistral Nemo 12B (7GB)":             "mistral-nemo",
+            "🧠 phi4 — Microsoft Phi 4 14B (9GB)":                  "phi4",
+            "💡 phi3.5 — Microsoft Phi 3.5 3B (2GB, very fast)":   "phi3.5",
+            "🔥 mixtral — Mixtral 8x7B MoE (26GB)":                "mixtral",
+            "💬 Custom model — type your own model name below":     "__custom__",
+        },
+        "paid_models": {},
+    },
+
+    # ═══════════════════════════════════════════
+    # 🎨 LM STUDIO  (Local GGUF — drag & drop any model)
+    # ═══════════════════════════════════════════
+    "🎨 LM Studio (Local)": {
+        "description": "Load any GGUF model file locally — drag & drop interface, OpenAI-compatible server",
+        "get_key_url": "https://lmstudio.ai/",
+        "free_tier": "✅ Completely FREE — use any GGUF from HuggingFace, no API key needed",
+        "endpoint": "http://localhost:1234/v1/chat/completions",
+        "type": "openai_compat",
+        "placeholder": "lm-studio (no key needed — leave blank or type anything)",
+        "local_only": True,
+        "free_models": {
+            "🎯 Currently Loaded Model — whatever is active in LM Studio": "local-model",
+        },
+        "paid_models": {},
+        "headers_extra": {},
+    },
+
+    # ═══════════════════════════════════════════
+    # ⚙️ LLAMA.CPP SERVER  (Advanced — run GGUF directly)
+    # ═══════════════════════════════════════════
+    "⚙️ llama.cpp Server (Local)": {
+        "description": "Advanced: run GGUF files directly with llama.cpp server — full control",
+        "get_key_url": "https://github.com/ggerganov/llama.cpp",
+        "free_tier": "✅ Completely FREE — any GGUF model, maximum control",
+        "endpoint": "http://localhost:8080/v1/chat/completions",
+        "type": "openai_compat",
+        "placeholder": "no key needed — leave blank",
+        "local_only": True,
+        "free_models": {
+            "🔧 Active GGUF Model — whatever model you launched the server with": "gpt-3.5-turbo",
+        },
+        "paid_models": {},
+        "headers_extra": {},
+    },
 }
 
 
@@ -370,7 +437,63 @@ def call_api(provider_name: str, api_key: str, model_id: str,
             return result[0].get("generated_text", "").strip()
         return str(result)
 
+    # ── Ollama Local Server ──
+    elif ptype == "ollama":
+        return _call_ollama(p["endpoint"], model_id, prompt, temperature, max_tokens)
+
     raise ValueError(f"Unknown provider type: {ptype}")
+
+
+def _call_ollama(endpoint: str, model_id: str, prompt: str,
+                 temperature: float, max_tokens: int) -> str:
+    """Call Ollama local server — handles streaming and non-streaming."""
+    # Test if Ollama is running first
+    try:
+        test = requests.get("http://localhost:11434/api/tags", timeout=3)
+    except requests.exceptions.ConnectionError:
+        raise ValueError(
+            "❌ Ollama is not running on your machine!\n\n"
+            "To start Ollama:\n"
+            "① Download Ollama from ollama.com/download\n"
+            "② Install it (Mac/Windows/Linux)\n"
+            "③ Open Terminal → run: ollama serve\n"
+            "④ Pull a model: ollama pull llama3.2\n"
+            "⑤ Come back and try again!\n\n"
+            "⚠️ Note: This only works when running the app LOCALLY (not on Streamlit Cloud)"
+        )
+    except Exception:
+        pass
+
+    payload = {
+        "model": model_id,
+        "messages": [{"role": "user", "content": prompt}],
+        "stream": False,
+        "options": {
+            "temperature": temperature,
+            "num_predict": max_tokens,
+        }
+    }
+    try:
+        r = requests.post(endpoint, json=payload, timeout=300)
+    except requests.exceptions.ConnectionError:
+        raise ValueError(
+            "❌ Cannot connect to Ollama at localhost:11434\n"
+            "Make sure Ollama is running: open Terminal and run 'ollama serve'"
+        )
+
+    if r.status_code == 404:
+        raise ValueError(
+            f"❌ Model '{model_id}' not found in Ollama.\n\n"
+            f"Pull it first — open Terminal and run:\n"
+            f"  ollama pull {model_id}\n\n"
+            f"See all available models at: ollama.com/library"
+        )
+    if r.status_code != 200:
+        raise ValueError(f"Ollama error {r.status_code}: {r.text[:200]}")
+
+    data = r.json()
+    # Ollama /api/chat response format
+    return data.get("message", {}).get("content", "").strip()
 
 
 def _check_errors(r, provider_name: str):

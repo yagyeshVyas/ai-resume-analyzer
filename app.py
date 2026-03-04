@@ -198,10 +198,20 @@ with st.sidebar:
     if entered_key:
         st.session_state.api_keys[selected_provider] = entered_key.strip()
 
+    # Local providers don't need a key
+    is_local = pinfo.get("local_only", False)
+    if is_local:
+        st.session_state.api_keys[selected_provider] = "local"
+
     # Always use the session-stored key (survives rerenders)
     api_key = st.session_state.api_keys.get(selected_provider, "").strip()
 
-    if api_key:
+    if is_local:
+        st.markdown("""<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:8px 10px;font-size:0.75rem;color:#10b981;margin-top:4px">
+        🖥️ <b>No API key needed!</b> Runs 100% on your machine.
+        </div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="api-box">Download: <a href="{pinfo['get_key_url']}" target="_blank">{pinfo['get_key_url'].replace('https://','')}</a></div>""", unsafe_allow_html=True)
+    elif api_key:
         st.markdown(f"""<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:6px 10px;font-size:0.75rem;color:#10b981;margin-top:4px">
         ✅ Key saved — <code style="font-size:0.7rem">{api_key[:8]}...{api_key[-4:]}</code>
         </div>""", unsafe_allow_html=True)
@@ -237,6 +247,26 @@ with st.sidebar:
                             key=f"model_{selected_provider}")
     all_provider_models = {**free_models, **paid_models}
     sel_id = all_provider_models.get(sel_name, sel_name)
+
+    # Custom model name for Ollama
+    if sel_id == "__custom__" or (is_local and "Ollama" in selected_provider):
+        custom_model = st.text_input(
+            "Custom model name:",
+            placeholder="e.g. llama3.2, mistral, phi4, deepseek-r1:7b",
+            key="ollama_custom_model"
+        )
+        if custom_model.strip():
+            sel_id = custom_model.strip()
+        elif sel_id == "__custom__":
+            sel_id = "llama3.2"  # safe fallback
+
+    # Local-only warning on Streamlit Cloud
+    if is_local:
+        st.markdown("""<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:8px 10px;font-size:0.74rem;color:#fbbf24;margin-top:6px;line-height:1.6">
+        ⚠️ <b>Local only!</b> This works when you run<br>
+        <code style="font-size:0.7rem">streamlit run app.py</code> on your own machine.<br>
+        Won't work on Streamlit Cloud.
+        </div>""", unsafe_allow_html=True)
 
     # ── Key status indicator ──
     if not api_key:
@@ -950,6 +980,96 @@ elif page == "🔑 API Guide":
     ⚡ <strong>Absolute cheapest paid option:</strong> DeepSeek V3 via DeepSeek API costs ~$0.00027 per 1000 tokens.
     A full resume analysis costs less than <strong>$0.001</strong> — literally 1000 analyses for $1.
     Get $5 free credits at platform.deepseek.com = <strong>5000 free analyses!</strong>
+    </div>""", unsafe_allow_html=True)
+
+    # ── LOCAL LLM SECTION ──
+    st.markdown('<div class="section-title">🖥️ Local LLM — Run AI on Your Own Machine (100% Free + Private)</div>', unsafe_allow_html=True)
+
+    st.markdown("""<div style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.25);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem">
+    <h3 style="font-family:Syne,sans-serif;color:#34d399;margin-bottom:0.5rem">🖥️ Ollama <span style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);font-size:0.7rem;padding:3px 10px;border-radius:100px;font-weight:700;margin-left:10px">⭐ EASIEST LOCAL OPTION</span></h3>
+    <p style="color:#94a3b8;margin-bottom:1rem">Ollama runs open-source models (Llama, DeepSeek, Gemma, Mistral, Phi) directly on your CPU or GPU. Zero cost forever. Zero privacy risk — nothing leaves your machine.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:1.2rem">
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:0.9rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#10b981;font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em">Cost</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem;font-size:0.88rem">$0 forever<br>No API key<br>No internet</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:0.9rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#f59e0b;font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em">Requirements</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem;font-size:0.88rem">8GB RAM min<br>16GB for 7B<br>32GB+ for 14B+</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:0.9rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#a78bfa;font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em">Where it works</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem;font-size:0.88rem">✅ Run app locally<br>❌ Streamlit Cloud<br>✅ Your laptop/PC</div>
+        </div>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1.2rem;border:1px solid rgba(255,255,255,0.06);margin-bottom:1rem">
+        <div style="color:#34d399;font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.8rem">📋 SETUP IN 5 STEPS (~5 minutes)</div>
+
+        <div style="font-size:0.86rem;color:#94a3b8;line-height:2.1">
+        <span style="color:#34d399;font-weight:700">Step 1</span> — Download Ollama:
+        <code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:5px;color:#a78bfa">ollama.com/download</code> (Mac / Windows / Linux)<br>
+
+        <span style="color:#34d399;font-weight:700">Step 2</span> — Install it (just double-click the installer)<br>
+
+        <span style="color:#34d399;font-weight:700">Step 3</span> — Open Terminal / Command Prompt and pull a model:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:5px;color:#a78bfa">ollama pull llama3.2</code> &nbsp; ← 2GB, good for most computers<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:5px;color:#a78bfa">ollama pull deepseek-r1:7b</code> &nbsp; ← 4GB, best reasoning<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:5px;color:#a78bfa">ollama pull phi3.5</code> &nbsp; ← 2GB, fastest on low RAM<br>
+
+        <span style="color:#34d399;font-weight:700">Step 4</span> — Start Ollama server:
+        <code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:5px;color:#a78bfa">ollama serve</code><br>
+
+        <span style="color:#34d399;font-weight:700">Step 5</span> — Run this app locally:
+        <code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:5px;color:#a78bfa">streamlit run app.py</code>
+        → Select <strong style="color:#e2e8f0">🖥️ Ollama (Local)</strong> in sidebar → pick your model → done!
+        </div>
+    </div>
+
+    <div style="background:rgba(139,92,246,0.06);border-radius:10px;padding:1rem;border:1px solid rgba(139,92,246,0.2);margin-bottom:0.8rem">
+        <div style="color:#a78bfa;font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.6rem">🎯 WHICH MODEL TO USE?</div>
+        <div style="font-size:0.84rem;color:#94a3b8;line-height:1.9">
+        <strong style="color:#e2e8f0">8GB RAM laptop:</strong> <code style="background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:4px;color:#a78bfa">ollama pull phi3.5</code> or <code style="background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:4px;color:#a78bfa">llama3.2</code> (2-3GB)<br>
+        <strong style="color:#e2e8f0">16GB RAM:</strong> <code style="background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:4px;color:#a78bfa">ollama pull llama3.1</code> or <code style="background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:4px;color:#a78bfa">deepseek-r1:7b</code> (4-5GB) ← best quality/speed<br>
+        <strong style="color:#e2e8f0">32GB RAM or GPU:</strong> <code style="background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:4px;color:#a78bfa">ollama pull qwen2.5:14b</code> or <code style="background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:4px;color:#a78bfa">deepseek-r1:14b</code> (8-9GB)<br>
+        <strong style="color:#e2e8f0">NVIDIA GPU (8GB+ VRAM):</strong> Ollama auto-detects GPU — blazing fast!
+        </div>
+    </div>
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown("""<div style="background:rgba(245,158,11,0.04);border:1px solid rgba(245,158,11,0.2);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem">
+    <h3 style="font-family:Syne,sans-serif;color:#fbbf24;margin-bottom:0.5rem">🎨 LM Studio <span style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);font-size:0.7rem;padding:3px 10px;border-radius:100px;font-weight:700;margin-left:10px">Drag & Drop ANY GGUF File</span></h3>
+    <p style="color:#94a3b8;margin-bottom:1rem">LM Studio has a beautiful GUI — browse HuggingFace, download any GGUF model, and load it with one click. Exposes an OpenAI-compatible local server.</p>
+
+    <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1.2rem;border:1px solid rgba(255,255,255,0.06)">
+        <div style="color:#fbbf24;font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.8rem">📋 SETUP IN 4 STEPS</div>
+        <div style="font-size:0.86rem;color:#94a3b8;line-height:2.1">
+        <span style="color:#fbbf24;font-weight:700">Step 1</span> — Download LM Studio from <code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:5px;color:#a78bfa">lmstudio.ai</code><br>
+        <span style="color:#fbbf24;font-weight:700">Step 2</span> — Inside LM Studio: search for any model (e.g. "Llama" or "Mistral") → Download<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;Or drag & drop your own .gguf file into the app window<br>
+        <span style="color:#fbbf24;font-weight:700">Step 3</span> — Click <strong style="color:#e2e8f0">"Local Server"</strong> tab → click <strong style="color:#e2e8f0">Start Server</strong><br>
+        <span style="color:#fbbf24;font-weight:700">Step 4</span> — In this app: select <strong style="color:#e2e8f0">🎨 LM Studio (Local)</strong> → no key needed → use!
+        </div>
+    </div>
+
+    <div style="background:rgba(16,185,129,0.06);border-radius:8px;padding:0.8rem;font-size:0.82rem;color:#34d399;margin-top:0.8rem">
+    ✅ <strong>Best for:</strong> Trying many different GGUF models from HuggingFace without using terminal commands
+    </div>
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown("""<div style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:1.2rem;margin-bottom:1rem">
+    <div style="font-family:Syne,sans-serif;font-weight:700;color:#a78bfa;margin-bottom:0.8rem">🏆 Local vs Cloud — When to Use What?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;font-size:0.84rem">
+        <div>
+        <div style="color:#10b981;font-weight:600;margin-bottom:0.4rem">✅ Use Local (Ollama/LM Studio) when:</div>
+        <div style="color:#94a3b8;line-height:1.8">• Your resume has sensitive personal info<br>• You want zero API cost forever<br>• You have 8GB+ RAM on your machine<br>• You want to run offline (no internet)<br>• You want to try cutting-edge new models</div>
+        </div>
+        <div>
+        <div style="color:#a78bfa;font-weight:600;margin-bottom:0.4rem">✅ Use Cloud APIs (OpenRouter/Groq) when:</div>
+        <div style="color:#94a3b8;line-height:1.8">• You're using Streamlit Cloud (deployed)<br>• You want the fastest response time<br>• You have a low-spec laptop (&lt;8GB RAM)<br>• You want the absolute best quality (Claude)<br>• You're sharing the app with others</div>
+        </div>
+    </div>
     </div>""", unsafe_allow_html=True)
 
 
