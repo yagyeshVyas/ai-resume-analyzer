@@ -207,7 +207,7 @@ with st.sidebar:
     page = st.radio("**📌 Navigate**", [
         "🎯 Analyzer", "✉️ Cover Letter",
         "🎤 Interview Prep", "📝 Resume Builder",
-        "📊 Dashboard", "ℹ️ About"
+        "📊 Dashboard", "🔑 API Guide", "📖 How to Use", "ℹ️ About"
     ], label_visibility="collapsed")
     st.markdown("---")
     st.markdown("<div style='font-size:0.72rem;color:#475569;text-align:center;line-height:1.8'>Built by <b style='color:#7c3aed'>Yagyesh Vyas</b><br>Python · 10+ AI APIs · SQLite · Streamlit</div>", unsafe_allow_html=True)
@@ -615,9 +615,681 @@ elif page == "📊 Dashboard":
 
 
 # ════════════════════════════════════════════════════════
-# ℹ️ ABOUT
+# 🔑 API GUIDE
 # ════════════════════════════════════════════════════════
-elif page == "ℹ️ About":
+elif page == "🔑 API Guide":
+    st.markdown("""<div class="hero">
+        <div class="hero-badge">Free · Paid · Step-by-Step Setup</div>
+        <h1>🔑 Complete API Guide</h1>
+        <p>Every AI provider explained — where to get keys, how much they cost, which is best for you</p>
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown("""<div class="success-box">
+    💡 <strong>Best strategy for beginners:</strong> Start with <strong>🔀 OpenRouter</strong> (one key = access to 200+ models) or
+    <strong>⚡ Groq</strong> (fastest free inference). Both are completely free with no credit card!
+    </div>""", unsafe_allow_html=True)
+
+    # ── FREE PROVIDERS FIRST ──
+    st.markdown('<div class="section-title">🆓 Free Providers — No Credit Card Needed</div>', unsafe_allow_html=True)
+
+    # OpenRouter
+    st.markdown("""<div class="glass-card" style="background:rgba(139,92,246,0.05);border:1px solid rgba(139,92,246,0.3);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem">
+    <h3 style="color:#a78bfa;font-family:Syne;margin-bottom:0.8rem">🔀 OpenRouter <span style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);font-size:0.7rem;padding:3px 10px;border-radius:100px;font-weight:700;margin-left:10px">⭐ RECOMMENDED</span></h3>
+    <p style="color:#94a3b8;margin-bottom:1rem">One API key gives you access to <strong style="color:#e2e8f0">200+ models</strong> from OpenAI, Anthropic, Google, Meta, and more. Best starting point.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#10b981;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Free Tier</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem">20 req/min<br>200 req/day<br>No credit card</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#f59e0b;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Paid Tier</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem">Pay per token<br>Same as direct<br>No markup</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#a78bfa;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Key Format</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem;font-family:monospace;font-size:0.85rem">sk-or-v1-...</div>
+        </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.05);margin-bottom:1rem">
+        <div style="color:#a78bfa;font-weight:700;font-size:0.8rem;margin-bottom:0.5rem">📋 HOW TO GET YOUR FREE KEY (2 minutes)</div>
+        <div style="color:#94a3b8;font-size:0.88rem;line-height:1.8">
+        1. Go to <strong style="color:#a78bfa">openrouter.ai/keys</strong><br>
+        2. Click "Sign In" → Sign up with Google (free)<br>
+        3. Click "Create Key" → give it any name<br>
+        4. Copy the key (starts with <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">sk-or-v1-</code>)<br>
+        5. Paste into this app's sidebar → done!<br>
+        <br>
+        💡 <strong style="color:#e2e8f0">Tip:</strong> Use <strong>🎲 Auto Free Router</strong> as model — it never gives 404 errors!
+        </div>
+    </div>
+    <div style="background:rgba(16,185,129,0.06);border-radius:8px;padding:0.8rem;border:1px solid rgba(16,185,129,0.2);font-size:0.82rem;color:#34d399">
+    ✅ Best free models: Auto Router · Llama 3.3 70B · GPT-OSS 120B · Qwen3 Coder · NVIDIA Nemotron · Gemma 3 27B
+    </div>
+    </div>""", unsafe_allow_html=True)
+
+    # Groq
+    st.markdown("""<div class="glass-card" style="background:rgba(245,158,11,0.04);border:1px solid rgba(245,158,11,0.25);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem">
+    <h3 style="color:#fbbf24;font-family:Syne;margin-bottom:0.8rem">⚡ Groq <span style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);font-size:0.7rem;padding:3px 10px;border-radius:100px;font-weight:700;margin-left:10px">FASTEST FREE — 10x speed</span></h3>
+    <p style="color:#94a3b8;margin-bottom:1rem">Groq runs open-source models on custom LPU chips — <strong style="color:#e2e8f0">10x faster</strong> than any other provider. Llama 3.3 70B completes in ~2 seconds vs 15+ on others.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#10b981;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Free Tier</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem">30 req/min<br>14,400 req/day<br>No credit card</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#f59e0b;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Speed</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem">~2 sec response<br>Fastest on earth<br>LPU hardware</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#a78bfa;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Key Format</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem;font-family:monospace;font-size:0.85rem">gsk_...</div>
+        </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.05)">
+        <div style="color:#fbbf24;font-weight:700;font-size:0.8rem;margin-bottom:0.5rem">📋 HOW TO GET YOUR FREE KEY</div>
+        <div style="color:#94a3b8;font-size:0.88rem;line-height:1.8">
+        1. Go to <strong style="color:#fbbf24">console.groq.com</strong><br>
+        2. Sign up free → verify email<br>
+        3. Click "API Keys" in sidebar → "Create API Key"<br>
+        4. Copy key (starts with <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">gsk_</code>) → paste here
+        </div>
+    </div>
+    <div style="background:rgba(245,158,11,0.06);border-radius:8px;padding:0.8rem;border:1px solid rgba(245,158,11,0.2);font-size:0.82rem;color:#fbbf24;margin-top:0.8rem">
+    ⚡ Best free models: Llama 3.3 70B Versatile · DeepSeek R1 Distill · Gemma2 9B · Mixtral 8x7B · Llama 3.2 Vision
+    </div>
+    </div>""", unsafe_allow_html=True)
+
+    # Google Gemini
+    st.markdown("""<div class="glass-card" style="background:rgba(96,165,250,0.04);border:1px solid rgba(96,165,250,0.25);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem">
+    <h3 style="color:#93c5fd;font-family:Syne;margin-bottom:0.8rem">🌙 Google Gemini <span style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);font-size:0.7rem;padding:3px 10px;border-radius:100px;font-weight:700;margin-left:10px">FREE — 1M tokens/day</span></h3>
+    <p style="color:#94a3b8;margin-bottom:1rem">Official Google API — Gemini 2.0 Flash is free and extremely capable. <strong style="color:#e2e8f0">1 million tokens/day free</strong> — that's 1000+ resume analyses!</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#10b981;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Free Tier</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem">15 req/min<br>1M tokens/day<br>No credit card</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#f59e0b;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Paid Models</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem">Gemini 1.5 Pro<br>$1.25/$5 per M<br>2M ctx window</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#a78bfa;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Key Format</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem;font-family:monospace;font-size:0.85rem">AIza...</div>
+        </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.05)">
+        <div style="color:#93c5fd;font-weight:700;font-size:0.8rem;margin-bottom:0.5rem">📋 HOW TO GET YOUR FREE KEY</div>
+        <div style="color:#94a3b8;font-size:0.88rem;line-height:1.8">
+        1. Go to <strong style="color:#93c5fd">aistudio.google.com/app/apikey</strong><br>
+        2. Sign in with Google account (free)<br>
+        3. Click "Create API Key" → copy it (starts with <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">AIza</code>)<br>
+        4. Paste into this app → select Google Gemini provider
+        </div>
+    </div>
+    </div>""", unsafe_allow_html=True)
+
+    # Hugging Face
+    st.markdown("""<div class="glass-card" style="background:rgba(251,191,36,0.04);border:1px solid rgba(251,191,36,0.2);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem">
+    <h3 style="color:#fde68a;font-family:Syne;margin-bottom:0.8rem">🤗 Hugging Face <span style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);font-size:0.7rem;padding:3px 10px;border-radius:100px;font-weight:700;margin-left:10px">FREE Serverless API</span></h3>
+    <p style="color:#94a3b8;margin-bottom:1rem">World's largest open-source AI hub. Free Serverless Inference API for popular models — no setup needed.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#10b981;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Free Tier</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem">Free inference<br>Rate limited<br>No credit card</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#f59e0b;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Models</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem">Llama 3.1 8B<br>Gemma 2 9B<br>Qwen 2.5 7B</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#a78bfa;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Key Format</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem;font-family:monospace;font-size:0.85rem">hf_...</div>
+        </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.05)">
+        <div style="color:#fde68a;font-weight:700;font-size:0.8rem;margin-bottom:0.5rem">📋 HOW TO GET YOUR FREE KEY</div>
+        <div style="color:#94a3b8;font-size:0.88rem;line-height:1.8">
+        1. Go to <strong style="color:#fde68a">huggingface.co/settings/tokens</strong><br>
+        2. Create free account → Settings → Access Tokens<br>
+        3. Create new token (type: "Read") → copy key (starts with <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">hf_</code>)<br>
+        4. Note: Some models may take 30s to load ("cold start")
+        </div>
+    </div>
+    </div>""", unsafe_allow_html=True)
+
+    # Cohere
+    st.markdown("""<div class="glass-card" style="background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.2);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem">
+    <h3 style="color:#6ee7b7;font-family:Syne;margin-bottom:0.8rem">🌊 Cohere <span style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);font-size:0.7rem;padding:3px 10px;border-radius:100px;font-weight:700;margin-left:10px">FREE 1000 req/month</span></h3>
+    <p style="color:#94a3b8;margin-bottom:1rem">Excellent for document analysis and RAG. Command R is their free flagship — great for resume analysis.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#10b981;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Free Tier</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem">20 req/min<br>1000 req/month<br>No credit card</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#f59e0b;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Paid</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem">Command R+<br>$2.5/$10 per M<br>Enterprise ready</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.06)">
+            <div style="color:#a78bfa;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em">Key Format</div>
+            <div style="color:#e2e8f0;margin-top:0.3rem;font-family:monospace;font-size:0.85rem">random string</div>
+        </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1rem;border:1px solid rgba(255,255,255,0.05)">
+        <div style="color:#6ee7b7;font-weight:700;font-size:0.8rem;margin-bottom:0.5rem">📋 HOW TO GET YOUR FREE KEY</div>
+        <div style="color:#94a3b8;font-size:0.88rem;line-height:1.8">
+        1. Go to <strong style="color:#6ee7b7">dashboard.cohere.com</strong><br>
+        2. Sign up free → API Keys section<br>
+        3. Copy your Trial API key<br>
+        4. Select Cohere provider in sidebar
+        </div>
+    </div>
+    </div>""", unsafe_allow_html=True)
+
+    # ── PAID / CREDITS PROVIDERS ──
+    st.markdown('<div class="section-title">💳 Paid Providers — Best Quality (some have free credits on signup)</div>', unsafe_allow_html=True)
+
+    # Pricing table
+    st.markdown("""<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.5rem;margin-bottom:1.2rem;overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+        <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+                <th style="text-align:left;padding:10px;color:#a78bfa;font-family:Syne;letter-spacing:0.05em">Provider</th>
+                <th style="text-align:left;padding:10px;color:#a78bfa;font-family:Syne;letter-spacing:0.05em">Free Credits</th>
+                <th style="text-align:left;padding:10px;color:#a78bfa;font-family:Syne;letter-spacing:0.05em">Best Model</th>
+                <th style="text-align:left;padding:10px;color:#a78bfa;font-family:Syne;letter-spacing:0.05em">Cost/Resume*</th>
+                <th style="text-align:left;padding:10px;color:#a78bfa;font-family:Syne;letter-spacing:0.05em">Get Key</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                <td style="padding:10px;color:#e2e8f0">👑 Anthropic</td>
+                <td style="padding:10px;color:#ef4444">❌ None</td>
+                <td style="padding:10px;color:#e2e8f0">Claude 3.5 Sonnet</td>
+                <td style="padding:10px;color:#f59e0b">~$0.005</td>
+                <td style="padding:10px"><a href="https://console.anthropic.com" target="_blank" style="color:#a78bfa;text-decoration:none">console.anthropic.com</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                <td style="padding:10px;color:#e2e8f0">💎 OpenAI</td>
+                <td style="padding:10px;color:#f59e0b">~$5 new accounts</td>
+                <td style="padding:10px;color:#e2e8f0">GPT-4o Mini</td>
+                <td style="padding:10px;color:#10b981">~$0.0003</td>
+                <td style="padding:10px"><a href="https://platform.openai.com/api-keys" target="_blank" style="color:#a78bfa;text-decoration:none">platform.openai.com</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                <td style="padding:10px;color:#e2e8f0">🧠 DeepSeek</td>
+                <td style="padding:10px;color:#f59e0b">~$5 new accounts</td>
+                <td style="padding:10px;color:#e2e8f0">DeepSeek R1</td>
+                <td style="padding:10px;color:#10b981">~$0.001</td>
+                <td style="padding:10px"><a href="https://platform.deepseek.com" target="_blank" style="color:#a78bfa;text-decoration:none">platform.deepseek.com</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                <td style="padding:10px;color:#e2e8f0">🔥 Together AI</td>
+                <td style="padding:10px;color:#10b981">✅ $25 free!</td>
+                <td style="padding:10px;color:#e2e8f0">Llama 3.3 70B Turbo</td>
+                <td style="padding:10px;color:#10b981">~$0.002</td>
+                <td style="padding:10px"><a href="https://api.together.xyz" target="_blank" style="color:#a78bfa;text-decoration:none">api.together.xyz</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                <td style="padding:10px;color:#e2e8f0">🔥 xAI Grok</td>
+                <td style="padding:10px;color:#10b981">✅ $25 free!</td>
+                <td style="padding:10px;color:#e2e8f0">Grok 3 Mini</td>
+                <td style="padding:10px;color:#10b981">~$0.001</td>
+                <td style="padding:10px"><a href="https://console.x.ai" target="_blank" style="color:#a78bfa;text-decoration:none">console.x.ai</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                <td style="padding:10px;color:#e2e8f0">⚡ Mistral AI</td>
+                <td style="padding:10px;color:#f59e0b">Free trial credits</td>
+                <td style="padding:10px;color:#e2e8f0">Mistral Small</td>
+                <td style="padding:10px;color:#10b981">~$0.0002</td>
+                <td style="padding:10px"><a href="https://console.mistral.ai" target="_blank" style="color:#a78bfa;text-decoration:none">console.mistral.ai</a></td>
+            </tr>
+            <tr>
+                <td style="padding:10px;color:#e2e8f0">🌐 Perplexity</td>
+                <td style="padding:10px;color:#ef4444">❌ None</td>
+                <td style="padding:10px;color:#e2e8f0">Sonar (web search!)</td>
+                <td style="padding:10px;color:#f59e0b">~$0.005</td>
+                <td style="padding:10px"><a href="https://www.perplexity.ai/settings/api" target="_blank" style="color:#a78bfa;text-decoration:none">perplexity.ai/api</a></td>
+            </tr>
+        </tbody>
+    </table>
+    <p style="color:#475569;font-size:0.75rem;margin-top:0.8rem">* Estimated cost per resume analysis (~2000 tokens input + 500 output)</p>
+    </div>""", unsafe_allow_html=True)
+
+    # ── MODEL COMPARISON ──
+    st.markdown('<div class="section-title">🏆 Which Model Should You Use?</div>', unsafe_allow_html=True)
+    st.markdown("""<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="info-box">
+        <strong>🆓 Best Free Setup (Zero Cost):</strong><br><br>
+        1st choice: <strong>🔀 OpenRouter</strong> → Auto Free Router<br>
+        2nd choice: <strong>⚡ Groq</strong> → Llama 3.3 70B (fastest)<br>
+        3rd choice: <strong>🌙 Google Gemini</strong> → Gemini 2.0 Flash<br><br>
+        All three give excellent results for resume analysis — completely free!
+        </div>
+        <div class="info-box">
+        <strong>💎 Best Paid Setup (Best Results):</strong><br><br>
+        Best quality: <strong>👑 Claude 3.5 Sonnet</strong> via Anthropic or OpenRouter<br>
+        Best value: <strong>🧠 DeepSeek R1</strong> (~$0.001 per analysis!)<br>
+        Most features: <strong>🌐 Perplexity Sonar</strong> (has web search)<br><br>
+        Start with free, upgrade when you want even better analysis!
+        </div>
+    </div>""", unsafe_allow_html=True)
+
+    # ── TROUBLESHOOTING ──
+    st.markdown('<div class="section-title">🔧 Common Errors & Fixes</div>', unsafe_allow_html=True)
+    st.markdown("""
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `401 Unauthorized` | Wrong API key | Double-check key, no extra spaces |
+| `404 Not Found` | Model removed/renamed | Switch to Auto Free Router |
+| `429 Rate Limit` | Too many requests | Wait 1 min or switch model |
+| `402 Payment Required` | No credits | Add credits or use free model |
+| `503 Service Unavailable` | Model loading | Wait 30 sec (HuggingFace cold start) |
+| `timeout` | Slow model | Switch to Groq for fastest responses |
+    """)
+
+    # ── CHEAPEST WAY ──
+    st.markdown("""<div class="win-box">
+    ⚡ <strong>Absolute cheapest paid option:</strong> DeepSeek V3 via DeepSeek API costs ~$0.00027 per 1000 tokens.
+    A full resume analysis costs less than <strong>$0.001</strong> — literally 1000 analyses for $1.
+    Get $5 free credits at platform.deepseek.com = <strong>5000 free analyses!</strong>
+    </div>""", unsafe_allow_html=True)
+
+
+
+
+# ════════════════════════════════════════════════════════
+# 📖 HOW TO USE
+# ════════════════════════════════════════════════════════
+elif page == "📖 How to Use":
+    st.markdown("""<div class="hero">
+        <div class="hero-badge">Step-by-Step · Beginner Friendly · 5 Tools</div>
+        <h1>📖 How to Use This App</h1>
+        <p>New here? This page walks you through everything — from getting your free API key to landing more interviews</p>
+    </div>""", unsafe_allow_html=True)
+
+    # ── STEP 0: GET STARTED ──
+    st.markdown('<div class="section-title">🚀 Before You Start — Get Your Free API Key (2 minutes)</div>', unsafe_allow_html=True)
+    st.markdown("""
+<div style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(16,185,129,0.05));border:1px solid rgba(139,92,246,0.3);border-radius:16px;padding:1.8rem;margin-bottom:1.5rem">
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.2rem">
+
+<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:1.2rem;text-align:center">
+  <div style="font-size:2rem;margin-bottom:0.5rem">1️⃣</div>
+  <div style="font-family:Syne,sans-serif;font-weight:700;color:#a78bfa;margin-bottom:0.4rem">Go to OpenRouter</div>
+  <div style="font-size:0.82rem;color:#94a3b8;line-height:1.6">Visit<br><strong style="color:#e2e8f0">openrouter.ai/keys</strong><br>in your browser</div>
+</div>
+
+<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:1.2rem;text-align:center">
+  <div style="font-size:2rem;margin-bottom:0.5rem">2️⃣</div>
+  <div style="font-family:Syne,sans-serif;font-weight:700;color:#a78bfa;margin-bottom:0.4rem">Sign Up Free</div>
+  <div style="font-size:0.82rem;color:#94a3b8;line-height:1.6">Click Sign In<br>Sign up with Google<br><strong style="color:#10b981">No credit card needed</strong></div>
+</div>
+
+<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:1.2rem;text-align:center">
+  <div style="font-size:2rem;margin-bottom:0.5rem">3️⃣</div>
+  <div style="font-family:Syne,sans-serif;font-weight:700;color:#a78bfa;margin-bottom:0.4rem">Create & Paste Key</div>
+  <div style="font-size:0.82rem;color:#94a3b8;line-height:1.6">Click "Create Key"<br>Copy it (starts <code style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:3px;font-size:0.75rem">sk-or-v1-</code>)<br>Paste in the sidebar ←</div>
+</div>
+
+</div>
+<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:1rem;font-size:0.88rem;color:#e2e8f0">
+✅ <strong>That's it!</strong> You're now ready to use all 5 tools completely free.
+In the sidebar: select <strong>🔀 OpenRouter</strong> → keep model as <strong>🎲 Auto Free Router</strong> → you're set!
+</div>
+</div>
+""", unsafe_allow_html=True)
+
+    # ── TOOL 1: ANALYZER ──
+    st.markdown('<div class="section-title">🎯 Tool 1 — Resume Analyzer</div>', unsafe_allow_html=True)
+    st.markdown("""
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem">
+
+<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap">
+  <div style="font-size:2.5rem">🎯</div>
+  <div>
+    <div style="font-family:Syne,sans-serif;font-size:1.2rem;font-weight:700;color:#e2e8f0">Resume Analyzer</div>
+    <div style="color:#94a3b8;font-size:0.88rem">Get your ATS score, job match %, interview probability, red flags & salary insight</div>
+  </div>
+  <div style="margin-left:auto">
+    <span style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:4px 12px;border-radius:100px;font-size:0.75rem;font-weight:700">~15 seconds</span>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem">
+<div>
+<div style="color:#a78bfa;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.6rem">📋 HOW TO USE</div>
+<div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1rem;font-size:0.86rem;color:#94a3b8;line-height:2">
+<span style="color:#a78bfa;font-weight:700">Step 1</span> — Upload your resume PDF <em>or</em> paste resume text<br>
+<span style="color:#a78bfa;font-weight:700">Step 2</span> — Type the job title (e.g. "Data Engineer")<br>
+<span style="color:#a78bfa;font-weight:700">Step 3</span> — Paste the full job description from LinkedIn/Indeed<br>
+<span style="color:#a78bfa;font-weight:700">Step 4</span> — Click <strong style="color:#e2e8f0">🚀 Analyze My Resume</strong><br>
+<span style="color:#a78bfa;font-weight:700">Step 5</span> — Download the full report as .txt
+</div>
+</div>
+<div>
+<div style="color:#10b981;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.6rem">📊 WHAT YOU GET</div>
+<div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1rem;font-size:0.86rem;color:#94a3b8;line-height:2">
+🎯 <strong style="color:#e2e8f0">ATS Score</strong> — how ATS robots rate your resume<br>
+💼 <strong style="color:#e2e8f0">Job Match %</strong> — how well you fit the role<br>
+📞 <strong style="color:#e2e8f0">Interview Probability</strong> — realistic callback chance<br>
+✅ <strong style="color:#e2e8f0">Matched & Missing Skills</strong> — keyword gaps<br>
+⚡ <strong style="color:#e2e8f0">Quick Wins</strong> — fix these TODAY for more callbacks<br>
+🚨 <strong style="color:#e2e8f0">Red Flags</strong> — what recruiters notice negatively<br>
+💰 <strong style="color:#e2e8f0">Salary Insight</strong> — your estimated market value
+</div>
+</div>
+</div>
+
+<div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:0.9rem;font-size:0.85rem;color:#fbbf24">
+💡 <strong>Pro Tip:</strong> Paste the COMPLETE job description — not just the title. The more text you give, the more accurate the keyword matching. Aim for <strong>ATS score 80+</strong> before applying!
+</div>
+</div>
+""", unsafe_allow_html=True)
+
+    # ── TOOL 2: COVER LETTER ──
+    st.markdown('<div class="section-title">✉️ Tool 2 — Cover Letter Generator</div>', unsafe_allow_html=True)
+    st.markdown("""
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem">
+
+<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap">
+  <div style="font-size:2.5rem">✉️</div>
+  <div>
+    <div style="font-family:Syne,sans-serif;font-size:1.2rem;font-weight:700;color:#e2e8f0">Cover Letter Generator</div>
+    <div style="color:#94a3b8;font-size:0.88rem">AI writes a custom, ATS-optimized cover letter tailored to the exact job</div>
+  </div>
+  <div style="margin-left:auto">
+    <span style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:4px 12px;border-radius:100px;font-size:0.75rem;font-weight:700">~20 seconds</span>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem">
+<div>
+<div style="color:#a78bfa;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.6rem">📋 HOW TO USE</div>
+<div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1rem;font-size:0.86rem;color:#94a3b8;line-height:2">
+<span style="color:#a78bfa;font-weight:700">Step 1</span> — Upload/paste your resume<br>
+<span style="color:#a78bfa;font-weight:700">Step 2</span> — Enter Job Title & Company name<br>
+<span style="color:#a78bfa;font-weight:700">Step 3</span> — Add hiring manager name (optional but helps!)<br>
+<span style="color:#a78bfa;font-weight:700">Step 4</span> — Paste the job description<br>
+<span style="color:#a78bfa;font-weight:700">Step 5</span> — Choose your tone (Formal / Professional / Friendly)<br>
+<span style="color:#a78bfa;font-weight:700">Step 6</span> — Click Generate → Download .txt
+</div>
+</div>
+<div>
+<div style="color:#10b981;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.6rem">✨ WHAT MAKES IT SPECIAL</div>
+<div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1rem;font-size:0.86rem;color:#94a3b8;line-height:2">
+✅ Starts with a strong hook (not "I am writing to apply")<br>
+✅ Uses YOUR actual achievements from resume<br>
+✅ Injects 5 ATS keywords from the job description<br>
+✅ Personalized to the specific company<br>
+✅ Right length — 3-4 paragraphs, ~380 words<br>
+✅ Sounds human, not generic AI
+</div>
+</div>
+</div>
+
+<div style="background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:0.9rem;font-size:0.85rem;color:#93c5fd">
+💡 <strong>After downloading:</strong> Copy into Google Docs → add your name/address header at top → save as PDF → ready to send! Don't forget to personalize 1-2 lines with something specific about the company.
+</div>
+</div>
+""", unsafe_allow_html=True)
+
+    # ── TOOL 3: INTERVIEW PREP ──
+    st.markdown('<div class="section-title">🎤 Tool 3 — Interview Prep Guide</div>', unsafe_allow_html=True)
+    st.markdown("""
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem">
+
+<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap">
+  <div style="font-size:2.5rem">🎤</div>
+  <div>
+    <div style="font-family:Syne,sans-serif;font-size:1.2rem;font-weight:700;color:#e2e8f0">Interview Prep Guide</div>
+    <div style="color:#94a3b8;font-size:0.88rem">Questions and ideal answers based on YOUR resume — not generic ones from Google</div>
+  </div>
+  <div style="margin-left:auto">
+    <span style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:4px 12px;border-radius:100px;font-size:0.75rem;font-weight:700">~25 seconds</span>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem">
+<div>
+<div style="color:#a78bfa;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.6rem">📋 HOW TO USE</div>
+<div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1rem;font-size:0.86rem;color:#94a3b8;line-height:2">
+<span style="color:#a78bfa;font-weight:700">Step 1</span> — Upload/paste your resume<br>
+<span style="color:#a78bfa;font-weight:700">Step 2</span> — Enter Job Title & Company<br>
+<span style="color:#a78bfa;font-weight:700">Step 3</span> — Paste the job description<br>
+<span style="color:#a78bfa;font-weight:700">Step 4</span> — Check which question types you want:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;🔧 Technical · 🧠 Behavioral · 💡 Situational · 🏢 Company Fit<br>
+<span style="color:#a78bfa;font-weight:700">Step 5</span> — Choose 2–5 questions per category<br>
+<span style="color:#a78bfa;font-weight:700">Step 6</span> — Generate → Download → Practice!
+</div>
+</div>
+<div>
+<div style="color:#10b981;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.6rem">📚 EACH QUESTION INCLUDES</div>
+<div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:1rem;font-size:0.86rem;color:#94a3b8;line-height:2">
+❓ The actual question (specific to YOUR experience)<br>
+🎯 Why interviewers ask this (so you understand intent)<br>
+✅ Ideal answer framework (3-4 bullets using your resume)<br>
+❌ Common mistake to avoid (so you don't fail)<br>
+<br>
+<em style="color:#64748b">Questions reference your actual projects, companies, and skills — not generic ones!</em>
+</div>
+</div>
+</div>
+
+<div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:0.9rem;font-size:0.85rem;color:#34d399">
+💡 <strong>Best practice:</strong> Download the guide → Print it → Practice each answer OUT LOUD 3 times → Record yourself on your phone → Watch it back. This alone increases interview success by 40%!
+</div>
+</div>
+""", unsafe_allow_html=True)
+
+    # ── TOOL 4: RESUME BUILDER ──
+    st.markdown('<div class="section-title">📝 Tool 4 — AI Resume Builder</div>', unsafe_allow_html=True)
+    st.markdown("""
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem">
+
+<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap">
+  <div style="font-size:2.5rem">📝</div>
+  <div>
+    <div style="font-family:Syne,sans-serif;font-size:1.2rem;font-weight:700;color:#e2e8f0">AI Resume Builder</div>
+    <div style="color:#94a3b8;font-size:0.88rem">Two powerful modes: Build from scratch OR rewrite your existing resume for any new job</div>
+  </div>
+  <div style="margin-left:auto">
+    <span style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:4px 12px;border-radius:100px;font-size:0.75rem;font-weight:700">~25 seconds</span>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem">
+
+<div style="background:rgba(139,92,246,0.05);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:1.2rem">
+<div style="color:#a78bfa;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.8rem">✨ MODE 1: Build Fresh Resume</div>
+<div style="font-size:0.86rem;color:#94a3b8;line-height:1.9">
+<span style="color:#a78bfa">→</span> Fill in your info (name, email, edu, experience, skills)<br>
+<span style="color:#a78bfa">→</span> Optionally paste a target job description<br>
+<span style="color:#a78bfa">→</span> AI builds a complete ATS-optimized resume<br>
+<span style="color:#a78bfa">→</span> Download as .txt → copy into Google Docs<br>
+<span style="color:#a78bfa">→</span> Go to Analyzer → check your ATS score!<br>
+<br>
+<em style="color:#64748b">Best for: students, career changers, first resume</em>
+</div>
+</div>
+
+<div style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:1.2rem">
+<div style="color:#10b981;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.8rem">🔄 MODE 2: Rewrite for New Job</div>
+<div style="font-size:0.86rem;color:#94a3b8;line-height:1.9">
+<span style="color:#10b981">→</span> Upload/paste your CURRENT resume<br>
+<span style="color:#10b981">→</span> Paste the target job description<br>
+<span style="color:#10b981">→</span> Choose rewrite options (ATS keywords / metrics / language)<br>
+<span style="color:#10b981">→</span> AI rewrites your ENTIRE resume for that job<br>
+<span style="color:#10b981">→</span> Download both versions to compare<br>
+<br>
+<em style="color:#64748b">Best for: applying to multiple different roles</em>
+</div>
+</div>
+</div>
+
+<div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:0.9rem;font-size:0.85rem;color:#fbbf24;margin-bottom:0.8rem">
+💡 <strong>Power workflow:</strong> Use Rewrite mode → download → paste back into Analyzer → check ATS score → if under 80%, rewrite again with more aggressive options. Repeat until 80+!
+</div>
+
+<div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:0.9rem;font-size:0.85rem;color:#f87171">
+⚠️ <strong>Important:</strong> AI keeps your facts 100% accurate but optimizes language. Never let AI invent jobs, degrees, or certifications that don't exist — this is resume fraud!
+</div>
+</div>
+""", unsafe_allow_html=True)
+
+    # ── TOOL 5: DASHBOARD ──
+    st.markdown('<div class="section-title">📊 Tool 5 — Progress Dashboard</div>', unsafe_allow_html=True)
+    st.markdown("""
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.8rem;margin-bottom:1.2rem">
+
+<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap">
+  <div style="font-size:2.5rem">📊</div>
+  <div>
+    <div style="font-family:Syne,sans-serif;font-size:1.2rem;font-weight:700;color:#e2e8f0">Progress Dashboard</div>
+    <div style="color:#94a3b8;font-size:0.88rem">Track all your analyses, see score trends, and discover which skills you keep missing</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:1.2rem">
+
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:1rem;text-align:center">
+  <div style="font-size:1.5rem;margin-bottom:0.4rem">📈</div>
+  <div style="color:#e2e8f0;font-size:0.82rem;font-weight:600">Score Trends</div>
+  <div style="color:#64748b;font-size:0.78rem;margin-top:0.3rem">See how your ATS & match scores improve over time</div>
+</div>
+
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:1rem;text-align:center">
+  <div style="font-size:1.5rem;margin-bottom:0.4rem">🎯</div>
+  <div style="color:#e2e8f0;font-size:0.82rem;font-weight:600">Skill Gap Chart</div>
+  <div style="color:#64748b;font-size:0.78rem;margin-top:0.3rem">Top skills you keep missing across all jobs</div>
+</div>
+
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:1rem;text-align:center">
+  <div style="font-size:1.5rem;margin-bottom:0.4rem">📋</div>
+  <div style="color:#e2e8f0;font-size:0.82rem;font-weight:600">Analysis History</div>
+  <div style="color:#64748b;font-size:0.78rem;margin-top:0.3rem">Full log of every resume + job you've analyzed</div>
+</div>
+</div>
+
+<div style="background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:0.9rem;font-size:0.85rem;color:#93c5fd">
+💡 <strong>How to use it:</strong> Analyze your resume against 5+ different jobs → come back here → you'll see which skills keep appearing in your "missing" list → those are the skills to learn next!
+</div>
+</div>
+""", unsafe_allow_html=True)
+
+    # ── FULL WORKFLOW ──
+    st.markdown('<div class="section-title">🔄 The Complete Job Application Workflow</div>', unsafe_allow_html=True)
+    st.markdown("""
+<div style="background:linear-gradient(135deg,rgba(139,92,246,0.06),rgba(16,185,129,0.04));border:1px solid rgba(139,92,246,0.25);border-radius:16px;padding:2rem;margin-bottom:1.5rem">
+
+<div style="display:flex;flex-direction:column;gap:0">
+
+<div style="display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+  <div style="width:36px;height:36px;border-radius:50%;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-weight:800;color:#a78bfa;flex-shrink:0;font-size:0.9rem">1</div>
+  <div>
+    <div style="font-weight:600;color:#e2e8f0;margin-bottom:0.2rem">🎯 Analyze your current resume against the target job</div>
+    <div style="font-size:0.84rem;color:#64748b">Go to <strong style="color:#94a3b8">Analyzer</strong> → upload resume + paste job description → get your baseline score</div>
+  </div>
+</div>
+
+<div style="display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+  <div style="width:36px;height:36px;border-radius:50%;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.4);display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-weight:800;color:#10b981;flex-shrink:0;font-size:0.9rem">2</div>
+  <div>
+    <div style="font-weight:600;color:#e2e8f0;margin-bottom:0.2rem">📝 If ATS score is below 80% → Rewrite your resume</div>
+    <div style="font-size:0.84rem;color:#64748b">Go to <strong style="color:#94a3b8">Resume Builder</strong> → Rewrite mode → paste resume + job description → download rewritten version</div>
+  </div>
+</div>
+
+<div style="display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+  <div style="width:36px;height:36px;border-radius:50%;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-weight:800;color:#a78bfa;flex-shrink:0;font-size:0.9rem">3</div>
+  <div>
+    <div style="font-weight:600;color:#e2e8f0;margin-bottom:0.2rem">🔁 Re-analyze the rewritten resume to verify 80+ ATS score</div>
+    <div style="font-size:0.84rem;color:#64748b">Go back to <strong style="color:#94a3b8">Analyzer</strong> → paste rewritten resume → confirm score improved → repeat if needed</div>
+  </div>
+</div>
+
+<div style="display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+  <div style="width:36px;height:36px;border-radius:50%;background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.4);display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-weight:800;color:#f59e0b;flex-shrink:0;font-size:0.9rem">4</div>
+  <div>
+    <div style="font-weight:600;color:#e2e8f0;margin-bottom:0.2rem">✉️ Write your cover letter</div>
+    <div style="font-size:0.84rem;color:#64748b">Go to <strong style="color:#94a3b8">Cover Letter</strong> → paste resume + job description → choose tone → generate → download</div>
+  </div>
+</div>
+
+<div style="display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+  <div style="width:36px;height:36px;border-radius:50%;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-weight:800;color:#ef4444;flex-shrink:0;font-size:0.9rem">5</div>
+  <div>
+    <div style="font-weight:600;color:#e2e8f0;margin-bottom:0.2rem">📩 Apply for the job (resume + cover letter ready!)</div>
+    <div style="font-size:0.84rem;color:#64748b">Copy resume into Word/Docs → format cleanly → save as PDF → submit with your cover letter</div>
+  </div>
+</div>
+
+<div style="display:flex;gap:1rem;align-items:flex-start;padding:1rem 0">
+  <div style="width:36px;height:36px;border-radius:50%;background:rgba(96,165,250,0.2);border:1px solid rgba(96,165,250,0.4);display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-weight:800;color:#60a5fa;flex-shrink:0;font-size:0.9rem">6</div>
+  <div>
+    <div style="font-weight:600;color:#e2e8f0;margin-bottom:0.2rem">🎤 If you get an interview → Use Interview Prep</div>
+    <div style="font-size:0.84rem;color:#64748b">Go to <strong style="color:#94a3b8">Interview Prep</strong> → paste resume + job description → generate questions → practice out loud 3 times each!</div>
+  </div>
+</div>
+
+</div>
+</div>
+""", unsafe_allow_html=True)
+
+    # ── FAQ ──
+    st.markdown('<div class="section-title">❓ Frequently Asked Questions</div>', unsafe_allow_html=True)
+
+    faqs = [
+        ("Is this really free?", "Yes! You only need a free OpenRouter API key (openrouter.ai/keys — no credit card). The app itself is free. The AI calls use your own key so you control the cost. With the free tier you get 200 requests/day — more than enough for daily job searching."),
+        ("Is my resume data private?", "Yes. Your resume is sent directly to the AI API and never stored on any server. The only data saved locally (on your computer) is your analysis history in a SQLite database for the Dashboard. Your API key is only in your browser session and is never saved."),
+        ("Why is my ATS score low?", "Low ATS scores usually mean: missing exact keywords from the job description, poor resume structure, or lack of quantified achievements. Use the 'Quick Wins' section in your analysis results — these are the fastest fixes. Then use the Rewrite tool to optimize."),
+        ("What if I get a 404 or 429 error?", "404 = model was removed. Fix: switch to '🎲 Auto Free Router' in sidebar. 429 = rate limit hit. Fix: wait 1 minute OR switch to a different provider (Groq has 14,400/day free). See the 🔑 API Guide page for full error explanations."),
+        ("Can I use this for any job type?", "Yes! It works for tech, business, healthcare, finance, marketing, and any other field. The AI adapts to whatever job description you paste. The more detailed your job description, the better the analysis."),
+        ("How accurate is the ATS score?", "It's a realistic estimate based on real ATS logic (keyword matching, formatting, quantified achievements). It won't be 100% identical to every ATS system, but following its suggestions consistently improves callback rates. Treat scores above 75 as a green light to apply."),
+        ("Should I use free or paid AI models?", "Free models (especially Llama 3.3 70B via Groq, or Auto Free Router via OpenRouter) give excellent results for resume analysis. Paid models like Claude 3.5 Sonnet give better writing quality for cover letters. Start free, upgrade if you want better cover letter writing."),
+        ("How do I make my resume ATS-friendly?", "Key rules: Use exact keywords from the job description, quantify every achievement (numbers/%), use standard section headers (Experience, Education, Skills), avoid tables/images/columns, list your skills explicitly, and keep to 1-2 pages. This app tells you all of this automatically!"),
+    ]
+
+    for q, a in faqs:
+        with st.expander(f"❓ {q}"):
+            st.markdown(f'<div style="color:#94a3b8;font-size:0.9rem;line-height:1.7;padding:0.5rem 0">{a}</div>', unsafe_allow_html=True)
+
+    # ── QUICK TIPS ──
+    st.markdown('<div class="section-title">⚡ Quick Tips for Best Results</div>', unsafe_allow_html=True)
+    tips = [
+        ("📄", "Always paste the FULL job description", "Don't just paste the title or bullet points — paste everything including requirements, responsibilities, and qualifications. More text = better keyword matching."),
+        ("🔄", "Analyze the SAME resume for multiple jobs", "Each job needs different keywords. Run the analyzer for each application and use the Rewrite tool to tailor your resume for every job separately."),
+        ("📊", "Aim for ATS score 75+ before applying", "If your ATS score is below 75, the automated system will likely reject you before a human sees it. Use Quick Wins + Rewrite tool to get above 75."),
+        ("🔢", "Add numbers everywhere", "\"Led a team\" → \"Led a team of 5\". \"Improved performance\" → \"Improved performance by 40%\". Numbers make you 40% more likely to pass screening."),
+        ("🔑", "Mirror the job description language exactly", "If the job says 'data pipeline' use exactly that phrase — not 'data workflow'. ATS systems do exact keyword matching, not synonym matching."),
+        ("💡", "Use the Dashboard to find skill gaps", "Analyze 10 jobs in your target field → check the Dashboard → the skills chart shows which skills appear most often across all your 'missing' lists — those are what to learn next!"),
+    ]
+    cols = st.columns(2)
+    for i, (icon, title, desc) in enumerate(tips):
+        with cols[i % 2]:
+            st.markdown(f"""<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:1.1rem;margin-bottom:0.8rem">
+<div style="display:flex;gap:0.7rem;align-items:flex-start">
+  <div style="font-size:1.4rem;flex-shrink:0">{icon}</div>
+  <div>
+    <div style="font-weight:600;color:#e2e8f0;font-size:0.9rem;margin-bottom:0.3rem">{title}</div>
+    <div style="font-size:0.82rem;color:#64748b;line-height:1.6">{desc}</div>
+  </div>
+</div>
+</div>""", unsafe_allow_html=True)
+
+    # ── READY CTA ──
+    st.markdown("""<div style="background:linear-gradient(135deg,rgba(139,92,246,0.12),rgba(16,185,129,0.08));border:1px solid rgba(139,92,246,0.35);border-radius:16px;padding:2rem;text-align:center;margin-top:2rem">
+<div style="font-family:Syne,sans-serif;font-size:1.4rem;font-weight:800;color:#e2e8f0;margin-bottom:0.6rem">🚀 Ready to Start?</div>
+<div style="color:#94a3b8;font-size:0.9rem;margin-bottom:1.2rem">Get your free API key → come back → click <strong style="color:#e2e8f0">🎯 Analyzer</strong> in the sidebar</div>
+<div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;font-size:0.85rem">
+  <a href="https://openrouter.ai/keys" target="_blank" style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);color:#a78bfa;padding:8px 20px;border-radius:10px;text-decoration:none;font-weight:700">🔀 Get OpenRouter Key (Free)</a>
+  <a href="https://console.groq.com/keys" target="_blank" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#fbbf24;padding:8px 20px;border-radius:10px;text-decoration:none;font-weight:700">⚡ Get Groq Key (Fastest)</a>
+  <a href="https://aistudio.google.com/app/apikey" target="_blank" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#93c5fd;padding:8px 20px;border-radius:10px;text-decoration:none;font-weight:700">🌙 Get Gemini Key (1M/day Free)</a>
+</div>
+</div>""", unsafe_allow_html=True)
+
+
+# ════════════════════════════════════════════════════════
     st.markdown("""<div class="hero"><div class="hero-badge">Free · Open Source · For Every Job Seeker</div>
     <h1>About AI Career Suite</h1>
     <p>Built by a job seeker, for job seekers — because ATS systems reject 75% of resumes before a human ever sees them</p></div>""", unsafe_allow_html=True)
