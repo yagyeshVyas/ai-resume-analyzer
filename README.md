@@ -316,7 +316,7 @@ MIT License — free to use, modify, and distribute.
 
 ## 👨‍💻 Author
 
-**Yagyesh Vyas** — Data & IT Developer · CS Graduate Student · F1 Visa
+**Yagyesh Vyas** — AI Engineer (Gen AI) 
 
 Built this because I kept getting ghosted after applying and couldn't afford the paid tools. If it helps you land an interview, please ⭐ star the repo.
 
