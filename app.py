@@ -151,6 +151,12 @@ hr { border-color:var(--border) !important; }
 
 init_db()
 
+# ── SESSION STATE INIT — persists keys across all rerenders ──
+if "api_keys" not in st.session_state:
+    st.session_state.api_keys = {}   # {provider_name: key_string}
+if "prev_provider" not in st.session_state:
+    st.session_state.prev_provider = None
+
 # ── SIDEBAR ──────────────────────────────────────────────
 with st.sidebar:
     st.markdown("<div style='font-family:Syne,sans-serif;font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent'>🚀 AI Career Suite</div>", unsafe_allow_html=True)
@@ -158,22 +164,50 @@ with st.sidebar:
 
     # ── Provider Selector ──
     st.markdown("**🌐 AI Provider**")
-    selected_provider = st.selectbox("", list(PROVIDERS.keys()), label_visibility="collapsed", key="provider_sel")
+    selected_provider = st.selectbox(
+        "", list(PROVIDERS.keys()),
+        label_visibility="collapsed", key="provider_sel"
+    )
     pinfo = PROVIDERS[selected_provider]
 
-    # Provider info box
+    # Show provider info
     free_tier_color = "#10b981" if "✅" in pinfo["free_tier"] else "#f59e0b"
-    st.markdown(f"""<div class="api-box" style="font-size:0.76rem; line-height:1.8">
+    st.markdown(f"""<div class="api-box" style="font-size:0.76rem;line-height:1.8">
     <b>{pinfo['description']}</b><br>
     <span style="color:{free_tier_color}">{pinfo['free_tier']}</span>
     </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
 
-    # ── API Key ──
+    # ── API Key — persisted per provider in session_state ──
     st.markdown(f"**🔑 {selected_provider} API Key**")
-    api_key = st.text_input("", type="password", placeholder=pinfo["placeholder"], label_visibility="collapsed")
-    st.markdown(f"""<div class="api-box">Get key: <a href="{pinfo['get_key_url']}" target="_blank">{pinfo['get_key_url'].replace('https://','')}</a></div>""", unsafe_allow_html=True)
+
+    # Pre-fill from saved key for this provider
+    saved_key = st.session_state.api_keys.get(selected_provider, "")
+
+    entered_key = st.text_input(
+        "",
+        value=saved_key,
+        type="password",
+        placeholder=pinfo["placeholder"],
+        label_visibility="collapsed",
+        key=f"apikey_{selected_provider}"   # unique key per provider — never resets
+    )
+
+    # Save key back whenever it changes
+    if entered_key:
+        st.session_state.api_keys[selected_provider] = entered_key.strip()
+
+    # Always use the session-stored key (survives rerenders)
+    api_key = st.session_state.api_keys.get(selected_provider, "").strip()
+
+    if api_key:
+        st.markdown(f"""<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:6px 10px;font-size:0.75rem;color:#10b981;margin-top:4px">
+        ✅ Key saved — <code style="font-size:0.7rem">{api_key[:8]}...{api_key[-4:]}</code>
+        </div>""", unsafe_allow_html=True)
+    else:
+        st.markdown(f"""<div class="api-box">Get free key: <a href="{pinfo['get_key_url']}" target="_blank">{pinfo['get_key_url'].replace('https://','')}</a></div>""", unsafe_allow_html=True)
+
     st.markdown("---")
 
     # ── Model Selector ──
@@ -182,7 +216,8 @@ with st.sidebar:
     has_paid = len(paid_models) > 0
 
     if has_free and has_paid:
-        tier = st.radio("**🤖 Model Tier**", ["🆓 Free", "💎 Paid"], horizontal=True)
+        tier = st.radio("**🤖 Model Tier**", ["🆓 Free", "💎 Paid"], horizontal=True,
+                        key=f"tier_{selected_provider}")
         if tier == "🆓 Free":
             st.markdown('<span class="free-badge">✓ No credits needed</span>', unsafe_allow_html=True)
             model_opts = list(free_models.keys())
@@ -198,10 +233,24 @@ with st.sidebar:
     else:
         model_opts = ["No models available"]
 
-    sel_name = st.selectbox("", model_opts, label_visibility="collapsed")
-    # Resolve model ID from the selected provider's models
+    sel_name = st.selectbox("", model_opts, label_visibility="collapsed",
+                            key=f"model_{selected_provider}")
     all_provider_models = {**free_models, **paid_models}
     sel_id = all_provider_models.get(sel_name, sel_name)
+
+    # ── Key status indicator ──
+    if not api_key:
+        st.markdown("""<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:8px 10px;font-size:0.78rem;color:#f87171;margin-top:6px">
+        ⚠️ <b>No API key entered.</b><br>
+        Paste your key above — it stays saved even when you switch pages or models!
+        </div>""", unsafe_allow_html=True)
+
+    # ── Saved keys summary (all providers) ──
+    saved_providers = [p for p, k in st.session_state.api_keys.items() if k]
+    if len(saved_providers) > 1:
+        st.markdown(f"""<div style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:6px 10px;font-size:0.73rem;color:#a78bfa;margin-top:4px">
+        🔑 Keys saved for {len(saved_providers)} providers
+        </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
     page = st.radio("**📌 Navigate**", [
@@ -229,6 +278,12 @@ def score_card(score, title):
     st.progress(score / 100)
 
 def ai_call(prompt, temperature=0.7, max_tokens=2500):
+    if not api_key:
+        raise ValueError(
+            "No API key entered!\n\n"
+            "👉 Paste your key in the sidebar ← under your provider.\n"
+            "🆓 Get a FREE key at openrouter.ai/keys (takes 2 minutes, no credit card)"
+        )
     return call_api(selected_provider, api_key, sel_id, prompt, temperature, max_tokens)
 
 
@@ -266,7 +321,9 @@ if page == "🎯 Analyzer":
 
     st.markdown("")
     if st.button("🚀 Analyze My Resume", type="primary", use_container_width=True, disabled=not api_key):
-        if not resume_text.strip(): st.error("❌ Please provide your resume.")
+        if not api_key:
+            st.error("❌ No API key! Paste your key in the sidebar ← first.")
+        elif not resume_text.strip(): st.error("❌ Please provide your resume.")
         elif not jd.strip():        st.error("❌ Please paste the job description.")
         elif len(jd) < 50:          st.error("❌ Job description too short — paste the full posting.")
         else:

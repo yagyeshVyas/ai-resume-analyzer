@@ -374,31 +374,107 @@ def call_api(provider_name: str, api_key: str, model_id: str,
 
 
 def _check_errors(r, provider_name: str):
-    """Unified error handler for all providers."""
+    """Unified error handler — clear actionable messages for every error type."""
     if r.status_code == 200:
         return
-    msg = ""
+
+    # Try to extract error message from response body
+    raw_msg = ""
     try:
         err = r.json()
-        msg = err.get("error", {}).get("message", "") or err.get("message", "") or str(err)
+        raw_msg = (
+            err.get("error", {}).get("message", "")
+            or err.get("message", "")
+            or err.get("detail", "")
+            or str(err)
+        )
     except Exception:
-        msg = r.text[:200]
+        raw_msg = r.text[:300]
 
     p = PROVIDERS.get(provider_name, {})
+    key_url = p.get("get_key_url", "")
 
     if r.status_code == 401:
-        raise ValueError(f"Invalid API key for {provider_name}. Get one at: {p.get('get_key_url','')}")
-    elif r.status_code == 402:
-        raise ValueError(f"No credits for {provider_name}. Add credits at: {p.get('get_key_url','')}")
-    elif r.status_code == 404:
-        raise ValueError(f"Model not found (404). Try a different model or use 🔀 OpenRouter Auto Router.")
-    elif r.status_code == 429:
         raise ValueError(
-            f"Rate limit hit on {provider_name}! "
-            f"{p.get('free_tier','')}\n"
-            "→ Wait 1 min, switch model, or use 🔀 OpenRouter Auto Router."
+            f"❌ Invalid API key for {provider_name}.\n\n"
+            "Most likely causes:\n"
+            "• You copied the key with extra spaces — paste it again carefully\n"
+            "• The key was deleted or reset in your provider dashboard\n"
+            "• You're using the wrong key for this provider\n\n"
+            f"🔑 Get/check your key at: {key_url}"
         )
+
+    elif r.status_code == 402:
+        raise ValueError(
+            f"❌ No credits remaining for {provider_name}.\n\n"
+            "Options:\n"
+            "• Switch to a FREE provider — OpenRouter, Groq, or Google Gemini\n"
+            "• Add more credits at your provider dashboard\n\n"
+            f"💳 Add credits at: {key_url}"
+        )
+
+    elif r.status_code == 403:
+        raise ValueError(
+            f"❌ Access forbidden (403) on {provider_name}.\n\n"
+            "This usually means:\n"
+            "• Your API key doesn't have permission for this model\n"
+            "• Free tier doesn't allow this model — switch to a free model\n"
+            "• For OpenRouter: enable 'Allow free model usage' at openrouter.ai/settings/privacy"
+        )
+
+    elif r.status_code == 404:
+        raise ValueError(
+            f"❌ Model not found (404) on {provider_name}.\n\n"
+            "This model was removed or renamed.\n\n"
+            "✅ Fix: Switch to a different model in the sidebar.\n"
+            "If using OpenRouter → use '🎲 Auto Free Router' — it NEVER gives 404 errors!"
+        )
+
+    elif r.status_code == 429:
+        free_tier = p.get("free_tier", "")
+        if provider_name == "🔀 OpenRouter":
+            raise ValueError(
+                "⏱️ OpenRouter rate limit hit (free tier: 20 req/min · 200 req/day).\n\n"
+                "Quick fixes — pick one:\n"
+                "① Wait 60 seconds and try again\n"
+                "② Switch model to '🎲 Auto Free Router' (spreads load automatically)\n"
+                "③ Switch provider to ⚡ Groq (30 req/min free, much higher limits)\n"
+                "④ Switch provider to 🌙 Google Gemini (1 million tokens/day free!)\n\n"
+                "💡 Best practice: use Groq for speed, OpenRouter as backup"
+            )
+        else:
+            raise ValueError(
+                f"⏱️ Rate limit hit on {provider_name}.\n"
+                f"Limit: {free_tier}\n\n"
+                "Quick fixes:\n"
+                "① Wait 60 seconds and retry\n"
+                "② Switch to a different model in sidebar\n"
+                "③ Switch to ⚡ Groq or 🌙 Google Gemini (both have generous free limits)"
+            )
+
+    elif r.status_code == 500:
+        raise ValueError(
+            f"❌ {provider_name} server error (500) — their servers are having issues.\n\n"
+            "This is not your fault. Try:\n"
+            "• Wait 30 seconds and retry\n"
+            "• Switch to a different provider (⚡ Groq is almost always up)"
+        )
+
     elif r.status_code == 503:
-        raise ValueError(f"Model loading (503) — Try again in 20 seconds or switch to a different model.")
+        if provider_name == "🤗 Hugging Face":
+            raise ValueError(
+                "⏳ Model is loading on Hugging Face (503 — cold start).\n\n"
+                "This is normal! The model needs ~30 seconds to wake up.\n"
+                "✅ Wait 30 seconds → click the button again → it will work!"
+            )
+        raise ValueError(
+            f"❌ {provider_name} is temporarily unavailable (503).\n"
+            "Wait 30 seconds and try again, or switch to ⚡ Groq."
+        )
+
     else:
-        raise ValueError(f"API error {r.status_code} from {provider_name}: {msg[:150]}")
+        raise ValueError(
+            f"❌ API error {r.status_code} from {provider_name}.\n"
+            f"Details: {raw_msg[:200]}\n\n"
+            "Try switching to a different model or provider."
+        )
